@@ -5,27 +5,27 @@ import { CheckCircle2, Clock, Globe2, ShieldCheck } from "lucide-react"
 const benefits = [
   {
     icon: CheckCircle2,
-    title: "Websites that actually sell",
+    title: "Be ahead of your competition",
     description:
-      "Every layout, copy block and interaction is designed to turn visitors into leads and paying clients.",
+      "Every layout, copy block and interaction specially designed to turn visitors into leads and paying clients.",
   },
   {
     icon: Clock,
     title: "Fast, predictable delivery",
     description:
-      "Most projects are delivered in days, not months — with a clear timeline and zero agency drama.",
+      "83% of our projects were delivered within 7 days —  have a clear timeline of development and a fast delivery.",
   },
   {
     icon: ShieldCheck,
     title: "End-to-end done for you",
     description:
-      "Domain, hosting, integrations and technical setup handled from start to finish. You just approve and go live.",
+      "Domain, hosting, integrations and technical setup handled from start to finish. You just approve and go live in a week.",
   },
   {
     icon: Globe2,
-    title: "Modern, premium look",
+    title: "Secure, modern, premium look",
     description:
-      "Clean, professional design that makes your brand look trustworthy and expensive without absurd prices.",
+      "Clean, professional design that makes your brand look trustworthy and expensive with 1/10 the price of overpriced agencies.",
   },
 ]
 
@@ -87,8 +87,8 @@ export function BenefitsSection() {
           </div>
 
           <p className="mt-8 text-lg md:text-xl text-muted-foreground leading-relaxed">
-            We specialize in creating professional websites for freelancers and small
-            businesses that want real results — not just a pretty page no one visits.
+            We specialize in creating professional websites for freelancers and SMB's 
+            that want real results — not just a pretty page no one visits.
           </p>
         </div>
 
