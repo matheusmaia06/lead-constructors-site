@@ -39,7 +39,7 @@ export function BenefitsSection() {
         {/* TÍTULO */}
         <div className="mb-14 md:mb-16 max-w-3xl">
           <p className="mb-3 text-xs font-semibold tracking-[0.28em] text-sky-500/80 uppercase">
-            WHY LEAD CONSTRUCTORS
+            Websites that actually sell.
           </p>
 
           <div className="relative inline-block">
@@ -52,7 +52,7 @@ export function BenefitsSection() {
                     "0 0.5px 0 rgba(15,23,42,0.35), 0 16px 40px rgba(15,23,42,0.12)",
                 }}
               >
-                Why choose
+                We are
               </span>
 
               {/* LEAD CONSTRUCTORS COM UNDERLINE NEON */}
