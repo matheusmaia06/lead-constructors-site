@@ -67,7 +67,7 @@ export function BenefitsSection() {
                 <span className="bg-gradient-to-r from-sky-500 via-cyan-400 to-emerald-400 bg-clip-text text-transparent">
                   Lead Constructors
                 </span>
-                <span className="text-slate-900">?</span>
+                <span className="text-slate-900">!</span>
 
                 {/* underline brilhante só nessa palavra */}
                 <span
