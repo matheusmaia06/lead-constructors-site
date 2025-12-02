@@ -18,8 +18,8 @@ export default function HomePage() {
       <Header />
       <main>
         <HeroSection />
-        <ServicesCarousel />
         <BenefitsSection />
+        <ServicesCarousel />
         <PortfolioSection />
         <ProcessSection />
         <PricingSection />
