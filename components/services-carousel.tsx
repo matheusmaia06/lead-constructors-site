@@ -2,7 +2,13 @@
 
 import { useEffect, useRef, useState } from "react"
 import { Code, Palette, Rocket, Search, Smartphone, Zap } from "lucide-react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
 import { FancySectionTitle } from "@/components/FancySectionTitle"
 
 type Service = {
@@ -16,40 +22,49 @@ const services: Service[] = [
   {
     icon: Code,
     title: "Web Development",
-    description: "Modern websites built with cutting-edge technologies and best practices",
+    description:
+      "Modern websites built with cutting-edge technologies and best practices.",
     color: "from-blue-500 to-cyan-500",
   },
   {
     icon: Smartphone,
     title: "Responsive Design",
-    description: "Pixel-perfect interfaces that adapt seamlessly to any device",
+    description:
+      "Pixel-perfect interfaces that adapt seamlessly to any device.",
     color: "from-purple-500 to-pink-500",
   },
   {
     icon: Search,
     title: "SEO Optimized",
-    description: "Rank higher on Google and drive organic traffic to your business",
+    description:
+      "Rank higher on Google and drive organic traffic to your business.",
     color: "from-green-500 to-emerald-500",
   },
   {
     icon: Zap,
     title: "High Performance",
-    description: "Lightning-fast load times that keep visitors engaged and converting",
+    description:
+      "Lightning-fast load times that keep visitors engaged and converting.",
     color: "from-yellow-500 to-orange-500",
   },
   {
     icon: Palette,
     title: "Premium Design",
-    description: "Sophisticated visuals that elevate your brand and build trust",
+    description:
+      "Clean, modern visuals aligned with your brand and audience.",
     color: "from-red-500 to-pink-500",
   },
   {
     icon: Rocket,
-    title: "Fast Launch",
-    description: "Your professional website delivered in 7 days, ready to generate leads",
+    title: "Conversion Focused",
+    description:
+      "Every section designed to drive leads, bookings and real revenue.",
     color: "from-indigo-500 to-blue-500",
   },
 ]
+
+// raio maior para afastar os cards do centro no desktop
+const DESKTOP_RADIUS = 260
 
 export function ServicesCarousel() {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
@@ -79,13 +94,15 @@ export function ServicesCarousel() {
   }, [])
 
   const getCardPosition = (index: number, rotation = 0) => {
-    const angle = (index * (360 / services.length) - rotation) * (Math.PI / 180)
-    const radius = 340
+    const angle =
+      ((index / services.length) * 360 + rotation) * (Math.PI / 180)
 
-    return {
-      x: Math.cos(angle) * radius,
-      y: Math.sin(angle) * radius,
-    }
+    const radius = DESKTOP_RADIUS
+
+    const x = Math.cos(angle) * radius
+    const y = Math.sin(angle) * radius
+
+    return { x, y }
   }
 
   return (
@@ -94,25 +111,31 @@ export function ServicesCarousel() {
       id="services"
       className="relative w-full py-20 md:py-32 overflow-hidden"
     >
-      {/* BACKGROUND GIF + OVERLAY (somente dentro da section) */}
+      {/* BACKGROUND VIDEO + OVERLAY */}
       <div className="pointer-events-none absolute inset-0 z-0">
-        <img
-          src="https://mir-s3-cdn-cf.behance.net/project_modules/disp/c4cd2469553149.5b85760ee5e4b.gif"
-          alt=""
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          preload="none"
+          aria-hidden="true"
           className="h-full w-full object-cover"
           style={{
-            opacity: 0.16, // bem discretinho
-            filter: "brightness(1.08) contrast(1.05)",
+            opacity: 0.9,
+            filter: "brightness(1.05) contrast(1.04)",
           }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-background/88 via-background/78 to-background/92" />
+        >
+          <source src="/portfolio/loopwave.webm" type="video/webm" />
+        </video>
+        <div className="absolute inset-0 bg-slate-950/70" />
       </div>
 
-      {/* Glows / pattern acima do GIF */}
-      <div className="absolute inset-0 dot-pattern opacity-10 z-[1]" />
-      <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-pulse-glow z-[1]" />
+      {/* Glows / pattern acima do vídeo */}
+      <div className="absolute inset-0 dot-pattern opacity-15 z-[1]" />
+      <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/15 rounded-full blur-3xl animate-pulse-glow z-[1]" />
       <div
-        className="absolute bottom-0 right-1/4 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-pulse-glow z-[1]"
+        className="absolute bottom-0 right-1/4 w-96 h-96 bg-accent/15 rounded-full blur-3xl animate-pulse-glow z-[1]"
         style={{ animationDelay: "1.5s" }}
       />
 
@@ -124,79 +147,103 @@ export function ServicesCarousel() {
           </FancySectionTitle>
 
           <p className="text-lg sm:text-xl text-muted-foreground text-balance leading-relaxed">
-            Everything you need for a powerful and professional digital presence
+            Everything you need for a powerful and professional digital
+            presence.
           </p>
         </div>
 
-        {/* Orbital Carousel Container */}
-        <div className="relative max-w-6xl mx-auto">
-          <div className="relative w-full aspect-square max-w-4xl mx-auto flex items-center justify-center">
+        {/* MOBILE – grid simples, sem órbita */}
+        <div className="mt-10 grid gap-6 sm:grid-cols-2 md:hidden">
+          {services.map((service) => (
+            <Card
+              key={service.title}
+              className="relative overflow-hidden border border-cyan-500/15 bg-slate-950/85 backdrop-blur-md"
+            >
+              <CardHeader className="pb-2">
+                <div
+                  className={`inline-flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br ${service.color} mb-3`}
+                >
+                  <service.icon className="h-6 w-6 text-white" />
+                </div>
+                <CardTitle className="text-base text-sky-100">
+                  {service.title}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-0 pb-4">
+                <CardDescription className="text-sm leading-relaxed">
+                  {service.description}
+                </CardDescription>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        {/* DESKTOP – Orbital Carousel */}
+        <div className="relative max-w-6xl mx-auto hidden md:block">
+          <div className="relative w-full md:aspect-[4/3] max-w-4xl mx-auto flex items-center justify-center">
             <div
-              className={`absolute inset-0 ${isVisible ? "animate-spin-slow" : ""}`}
+              className={`absolute inset-0 ${
+                isVisible ? "animate-spin-slow" : ""
+              }`}
               style={{ animationDuration: "60s" }}
             >
               {/* Núcleo central */}
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20">
                 <div className="relative w-48 h-48 md:w-64 md:h-64">
-                  {/* Outer rotating ring */}
                   <div
-                    className="absolute inset-0 rounded-full border-4 border-primary/20"
+                    className="absolute inset-0 rounded-full border-[3px] border-cyan-500/25"
                     style={{
                       background:
-                        "conic-gradient(from 0deg, hsl(var(--primary) / 0.3), transparent 50%, hsl(var(--primary) / 0.3))",
+                        "conic-gradient(from 0deg, rgba(34,211,238,0.35), transparent 55%, rgba(34,211,238,0.4))",
                     }}
                   />
-
-                  {/* Middle ring */}
-                  <div className="absolute inset-4 rounded-full border-2 border-primary/30 backdrop-blur-sm bg-background/50" />
-
-                  {/* Inner core */}
-                  <div className="absolute inset-8 rounded-full bg-gradient-to-br from-primary/20 via-accent/20 to-primary/20 backdrop-blur-md" />
+                  <div className="absolute inset-4 rounded-full border border-cyan-400/35 backdrop-blur-md bg-slate-950/60" />
+                  <div className="absolute inset-8 rounded-full bg-gradient-to-br from-cyan-500/25 via-sky-500/15 to-emerald-400/25 backdrop-blur-xl" />
                 </div>
               </div>
 
-              {/* SVG para linhas de conexão */}
-              <svg className="absolute inset-0 w-full h-full pointer-events-none z-10">
+              {/* Linhas de conexão (SVG) */}
+              <svg
+                className="absolute inset-0 w-full h-full pointer-events-none z-10"
+                viewBox="0 0 100 100"
+                preserveAspectRatio="xMidYMid meet"
+              >
                 <defs>
-                  <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity="0.2" />
-                    <stop offset="50%" stopColor="hsl(var(--primary))" stopOpacity="0.5" />
-                    <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity="0.2" />
+                  <linearGradient
+                    id="lineGradient"
+                    x1="0%"
+                    y1="0%"
+                    x2="100%"
+                    y2="100%"
+                  >
+                    <stop offset="0%" stopColor="#020617" stopOpacity="0" />
+                    <stop offset="35%" stopColor="#0ea5e9" stopOpacity="0.45" />
+                    <stop offset="70%" stopColor="#22d3ee" stopOpacity="0.35" />
+                    <stop offset="100%" stopColor="#020617" stopOpacity="0" />
                   </linearGradient>
                 </defs>
 
-                <circle
-                  cx="50%"
-                  cy="50%"
-                  r="45%"
-                  fill="none"
-                  stroke="url(#lineGradient)"
-                  strokeWidth="2"
-                  strokeDasharray="10 5"
-                  className="animate-pulse"
-                />
-
                 {services.map((_, index) => {
-                  const pos = getCardPosition(index)
-                  const offsetX = (pos.x / 340) * 45
-                  const offsetY = (pos.y / 340) * 45
+                  const pos = getCardPosition(index, 25)
+                  const offsetX = (pos.x / DESKTOP_RADIUS) * 40
+                  const offsetY = (pos.y / DESKTOP_RADIUS) * 40
 
                   return (
                     <line
                       key={index}
-                      x1="50%"
-                      y1="50%"
-                      x2={`${50 + offsetX}%`}
-                      y2={`${50 + offsetY}%`}
+                      x1="50"
+                      y1="50"
+                      x2={50 + offsetX}
+                      y2={50 + offsetY}
                       stroke="url(#lineGradient)"
-                      strokeWidth={hoveredIndex === index ? 3 : 1.5}
-                      className="transition-all duration-300"
+                      strokeWidth={hoveredIndex === index ? 2.4 : 1.2}
+                      className="transition-all duration-300 opacity-80"
                     />
                   )
                 })}
               </svg>
 
-              {/* Cards de serviços */}
+              {/* Cards em órbita */}
               {services.map((service, index) => {
                 const pos = getCardPosition(index)
                 const isHovered = hoveredIndex === index
@@ -206,9 +253,9 @@ export function ServicesCarousel() {
                     key={service.title}
                     className="absolute top-1/2 left-1/2 z-30 transition-transform duration-300"
                     style={{
-                      transform: `translate(calc(-50% + ${pos.x}px), calc(-50% + ${pos.y}px)) scale(${
-                        isHovered ? 1.1 : 1
-                      })`,
+                      transform: `translate(calc(-50% + ${pos.x}px), calc(-50% + ${
+                        pos.y
+                      }px)) scale(${isHovered ? 1.08 : 1})`,
                     }}
                   >
                     <div
@@ -217,37 +264,29 @@ export function ServicesCarousel() {
                       onMouseEnter={() => setHoveredIndex(index)}
                       onMouseLeave={() => setHoveredIndex(null)}
                     >
-                      <Card
-                        className={`group relative overflow-hidden border-border/50 backdrop-blur-md bg-card/80 transition-all duration-500 w-44 md:w-52 hover:shadow-2xl hover:shadow-primary/20 ${
-                          isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
-                        } ${isHovered ? "z-50" : ""}`}
-                      >
+                      <Card className="relative w-48 md:w-56 min-h-[190px] bg-slate-950/95 border border-cyan-500/40 shadow-xl shadow-cyan-500/25 overflow-hidden rounded-2xl">
+                        {/* Glow de fundo */}
                         <div
-                          className={`absolute inset-0 bg-gradient-to-br ${service.color} opacity-0 group-hover:opacity-10 transition-opacity duration-500`}
+                          className={`absolute inset-0 bg-gradient-to-br ${service.color} opacity-60`}
                         />
+                        <div className="absolute inset-[1px] rounded-2xl bg-slate-950/95 backdrop-blur-xl" />
 
-                        <CardHeader className="text-center pb-2 p-3 md:p-4">
-                          <div
-                            className={`inline-flex h-12 w-12 md:h-16 md:w-16 items-center justify-center rounded-xl bg-gradient-to-br ${service.color} mb-2 mx-auto transition-all duration-500 group-hover:scale-110 group-hover:rotate-6 shadow-lg`}
-                          >
-                            <service.icon className="h-6 w-6 md:h-8 md:w-8 text-white" />
+                        <CardHeader className="relative z-10 pb-1">
+                          <div className="flex items-center gap-2">
+                            <div className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-slate-900/80 border border-cyan-400/60">
+                              <service.icon className="h-5 w-5 text-cyan-300" />
+                            </div>
+                            <CardTitle className="text-sm md:text-base leading-tight text-sky-100">
+                              {service.title}
+                            </CardTitle>
                           </div>
-                          <CardTitle className="text-sm md:text-base group-hover:text-primary transition-colors duration-300">
-                            {service.title}
-                          </CardTitle>
                         </CardHeader>
 
-                        <CardContent className="text-center p-3 pt-0 md:p-4 md:pt-0">
-                          <CardDescription className="text-xs md:text-sm leading-relaxed line-clamp-3">
+                        <CardContent className="relative z-10 pt-1 pb-3">
+                          <CardDescription className="text-xs md:text-sm text-slate-200/85 leading-relaxed line-clamp-3">
                             {service.description}
                           </CardDescription>
                         </CardContent>
-
-                        <div className="absolute inset-0 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                          <div
-                            className={`absolute inset-0 rounded-lg bg-gradient-to-r ${service.color} opacity-20 blur-sm`}
-                          />
-                        </div>
                       </Card>
                     </div>
                   </div>

@@ -10,7 +10,7 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
           <div className="space-y-4">
             <Image 
-              src="/lead-constructors-logo.png" 
+              src="/lead-constructors-logo-3.png" 
               alt="Lead Constructors Logo" 
               width={200}
               height={50}

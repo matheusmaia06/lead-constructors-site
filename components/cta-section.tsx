@@ -33,64 +33,72 @@ export function CtaSection() {
         throw new Error("Failed to submit")
       }
 
-      setSuccess("Thanks! We’ll get back to you within 2 business hours.")
+      setSuccess("Thanks – we’ll get back to you within 2 business hours.")
       setName("")
       setEmail("")
       setCompany("")
       setMessage("")
     } catch (err) {
-      setError("Something went wrong. Please try again.")
+      setError("Something went wrong. Please try again in a moment.")
     } finally {
       setIsSubmitting(false)
     }
   }
 
   return (
-    <section className="relative w-full py-20 md:py-32 overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-br from-secondary via-secondary/95 to-primary/20" />
+    <section id="cta" className="relative w-full py-20 md:py-28 overflow-hidden">
+      {/* background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-secondary via-slate-950 to-primary/25" />
       <AnimatedBackground />
       <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-accent/10 animate-gradient" />
-      <div className="absolute inset-0 grid-bg opacity-20" />
-      
+      <div className="absolute inset-0 grid-bg opacity-15" />
+
       <div className="container relative z-10 px-4 sm:px-6 lg:px-8 mx-auto">
         <div className="max-w-4xl mx-auto">
-          <div className="text-center space-y-8">
-            <div className="inline-flex items-center gap-2 rounded-full bg-secondary-foreground/10 px-6 py-3 text-sm font-medium backdrop-blur-md border border-secondary-foreground/20">
-              <span className="relative flex h-3 w-3">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-3 w-3 bg-accent"></span>
+          <div className="text-center space-y-10">
+            {/* badge */}
+            <div className="inline-flex items-center gap-2 rounded-full bg-secondary-foreground/10 px-5 py-2.5 text-xs sm:text-sm font-medium backdrop-blur-md border border-secondary-foreground/20">
+              <span className="relative flex h-2.5 w-2.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-60" />
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-accent" />
               </span>
-              <span className="text-secondary-foreground">
-                Limited spots this month
+              <span className="text-secondary-foreground/80">
+                We take on a limited number of projects each month
               </span>
             </div>
-            
-            <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold text-secondary-foreground tracking-tight text-balance">
-              Ready To Transform Your Business?
-            </h2>
-            
-            <p className="text-lg sm:text-xl text-secondary-foreground/80 max-w-2xl mx-auto text-balance leading-relaxed">
-              Schedule a free consultation and discover how we can create the perfect website for your business
-            </p>
-            
-            <div className="max-w-xl mx-auto space-y-4">
+
+            {/* heading + text */}
+            <div className="space-y-4">
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-semibold text-secondary-foreground tracking-tight text-balance">
+                Tell us what you’re building.  
+              </h2>
+
+              <p className="text-base sm:text-lg text-secondary-foreground/80 max-w-2xl mx-auto leading-relaxed text-balance">
+                Share a bit about your business and what you need from your website. 
+                We’ll review everything and come back with a clear, no-pressure suggestion 
+                on how we can help.
+              </p>
+            </div>
+
+            {/* form */}
+            <div className="max-w-xl mx-auto space-y-5">
               <form onSubmit={handleSubmit} className="space-y-4 text-left">
                 <div className="grid gap-3 sm:grid-cols-2">
                   <Input
                     type="text"
                     required
-                    placeholder="Your name"
+                    placeholder="Name"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="h-12 bg-secondary-foreground/10 backdrop-blur-md border-secondary-foreground/20 text-secondary-foreground placeholder:text-secondary-foreground/50 focus:border-accent"
+                    className="h-11 bg-secondary-foreground/8 backdrop-blur-md border border-secondary-foreground/20 text-secondary-foreground placeholder:text-secondary-foreground/50 focus:border-accent focus:ring-0"
                   />
                   <Input
                     type="email"
                     required
-                    placeholder="Your best email"
+                    placeholder="Work email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="h-12 bg-secondary-foreground/10 backdrop-blur-md border-secondary-foreground/20 text-secondary-foreground placeholder:text-secondary-foreground/50 focus:border-accent"
+                    className="h-11 bg-secondary-foreground/8 backdrop-blur-md border border-secondary-foreground/20 text-secondary-foreground placeholder:text-secondary-foreground/50 focus:border-accent focus:ring-0"
                   />
                 </div>
 
@@ -99,57 +107,61 @@ export function CtaSection() {
                   placeholder="Company or website (optional)"
                   value={company}
                   onChange={(e) => setCompany(e.target.value)}
-                  className="h-12 bg-secondary-foreground/10 backdrop-blur-md border-secondary-foreground/20 text-secondary-foreground placeholder:text-secondary-foreground/50 focus:border-accent"
+                  className="h-11 bg-secondary-foreground/8 backdrop-blur-md border border-secondary-foreground/20 text-secondary-foreground placeholder:text-secondary-foreground/50 focus:border-accent focus:ring-0"
                 />
 
                 <Textarea
                   required
-                  placeholder="Tell us a bit about your project and how we can help"
+                  placeholder="What do you need your website to do for you?"
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
-                  className="min-h-[120px] bg-secondary-foreground/10 backdrop-blur-md border-secondary-foreground/20 text-secondary-foreground placeholder:text-secondary-foreground/50 focus:border-accent"
+                  className="min-h-[110px] bg-secondary-foreground/8 backdrop-blur-md border border-secondary-foreground/20 text-secondary-foreground placeholder:text-secondary-foreground/50 focus:border-accent focus:ring-0"
                 />
 
-                <div className="flex flex-col sm:flex-row items-center gap-3 sm:justify-between">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:justify-between">
                   <Button
                     type="submit"
                     size="lg"
                     disabled={isSubmitting}
-                    className="h-14 px-8 bg-primary hover:bg-primary/90 transition-all hover:scale-105 hover:shadow-xl hover:shadow-primary/50 whitespace-nowrap"
+                    className="h-12 px-7 rounded-full bg-primary hover:bg-primary/90 transition-all hover:shadow-lg hover:shadow-primary/40 whitespace-nowrap text-sm font-semibold"
                   >
-                    {isSubmitting ? "Sending..." : "Get Started"}
-                    <ArrowRight className="ml-2 h-5 w-5" />
+                    {isSubmitting ? "Sending..." : "Send message"}
+                    <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
-                  <p className="text-xs text-secondary-foreground/60">
-                    Response within 2 business hours
+
+                  <p className="text-xs sm:text-[13px] text-secondary-foreground/60">
+                    We usually reply in{" "}
+                    <span className="text-secondary-foreground/80 font-medium">
+                      under 2 business hours
+                    </span>.
                   </p>
                 </div>
 
                 {success && (
                   <p className="text-sm text-emerald-400">{success}</p>
                 )}
-                {error && (
-                  <p className="text-sm text-red-400">{error}</p>
-                )}
+                {error && <p className="text-sm text-red-400">{error}</p>}
               </form>
             </div>
-            
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-6 pt-8 text-secondary-foreground/80">
+
+            {/* secondary contact */}
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-5 pt-6 text-secondary-foreground/80">
               <a
                 href="mailto:hello@leadconstructors.com"
-                className="flex items-center gap-2 hover:text-accent transition-colors group"
+                className="flex items-center gap-2 hover:text-accent transition-colors group text-sm"
               >
                 <div className="p-2 rounded-lg bg-secondary-foreground/10 group-hover:bg-accent/20 transition-colors">
-                  <Mail className="h-5 w-5" />
+                  <Mail className="h-4 w-4" />
                 </div>
                 <span>hello@leadconstructors.com</span>
               </a>
+              <span className="hidden sm:inline-block h-4 w-px bg-secondary-foreground/20" />
               <a
                 href="tel:+18885551234"
-                className="flex items-center gap-2 hover:text-accent transition-colors group"
+                className="flex items-center gap-2 hover:text-accent transition-colors group text-sm"
               >
                 <div className="p-2 rounded-lg bg-secondary-foreground/10 group-hover:bg-accent/20 transition-colors">
-                  <Phone className="h-5 w-5" />
+                  <Phone className="h-4 w-4" />
                 </div>
                 <span>(888) 555-1234</span>
               </a>

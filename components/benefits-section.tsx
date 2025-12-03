@@ -1,6 +1,10 @@
 "use client"
 
 import { CheckCircle2, Clock, Globe2, ShieldCheck } from "lucide-react"
+import { motion } from "framer-motion"
+
+// ajuste aqui a opacidade do overlay (0 = transparente, 1 = totalmente escuro)
+const BENEFITS_OVERLAY_OPACITY = 0.8
 
 const benefits = [
   {
@@ -33,8 +37,35 @@ export function BenefitsSection() {
   return (
     <section
       id="benefits"
-      className="relative w-full bg-background py-20 md:py-28 lg:py-32 overflow-hidden"
+      className="relative w-full py-20 md:py-28 lg:py-32 overflow-hidden"
     >
+      {/* FADE PARA HERO (EM CIMA) */}
+      <div className="pointer-events-none absolute -top-24 left-0 right-0 h-24 z-0 bg-gradient-to-b from-transparent to-slate-950/90" />
+
+      {/* FADE PARA PRÓXIMA SECTION (EMBAIXO) */}
+      <div className="pointer-events-none absolute -bottom-24 left-0 right-0 h-24 z-0 bg-gradient-to-t from-transparent to-slate-950/90" />
+
+      {/* BACKGROUND VIDEO */}
+      <div className="pointer-events-none absolute inset-0 -z-10">
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          preload="none"
+          aria-hidden="true"
+          className="h-full w-full object-cover"
+        >
+          <source src="/portfolio/bluetechbackground.webm" type="video/webm" />
+        </video>
+
+        {/* overlay com opacidade configurável */}
+        <div
+          className="absolute inset-0 bg-slate-950"
+          style={{ opacity: BENEFITS_OVERLAY_OPACITY }}
+        />
+      </div>
+
       <div className="container mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         {/* TÍTULO */}
         <div className="mb-14 md:mb-16 max-w-3xl">
@@ -45,17 +76,15 @@ export function BenefitsSection() {
           <div className="relative inline-block">
             <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl leading-tight">
               <span
-                className="block text-slate-900 font-semibold tracking-tight"
+                className="block font-semibold tracking-tight bg-gradient-to-r from-sky-500 via-cyan-400 to-emerald-400 bg-clip-text text-transparent"
                 style={{
-                  WebkitTextStroke: "0.45px rgba(15,23,42,0.25)",
                   textShadow:
-                    "0 0.5px 0 rgba(15,23,42,0.35), 0 16px 40px rgba(15,23,42,0.12)",
+                    "0 0.5px 0 rgba(15,23,42,0.4), 0 16px 40px rgba(15,23,42,0.6)",
                 }}
               >
                 We are
               </span>
 
-              {/* LEAD CONSTRUCTORS COM UNDERLINE NEON */}
               <span
                 className="relative mt-1 inline-block font-semibold tracking-tight text-slate-900"
                 style={{
@@ -69,8 +98,7 @@ export function BenefitsSection() {
                 </span>
                 <span className="text-slate-900">!</span>
 
-                {/* underline brilhante só nessa palavra */}
-                <span
+                <motion.span
                   className="pointer-events-none absolute left-0 right-0"
                   style={{
                     bottom: "-0.14em",
@@ -80,6 +108,14 @@ export function BenefitsSection() {
                       "linear-gradient(90deg, #1FA2FF, #12D8FA, #A6FFCB)",
                     boxShadow:
                       "0 0 10px rgba(56,189,248,0.9), 0 0 20px rgba(56,189,248,0.65)",
+                    transformOrigin: "left center",
+                  }}
+                  initial={{ scaleX: 0, opacity: 0 }}
+                  whileInView={{ scaleX: 1, opacity: 1 }}
+                  viewport={{ once: true, amount: 0.6 }}
+                  transition={{
+                    duration: 0.5,
+                    ease: [0.16, 1, 0.3, 1],
                   }}
                 />
               </span>
@@ -87,7 +123,7 @@ export function BenefitsSection() {
           </div>
 
           <p className="mt-8 text-lg md:text-xl text-muted-foreground leading-relaxed">
-            We specialize in creating professional websites for freelancers and SMB's 
+            We specialize in creating professional websites for freelancers and SMB&apos;s 
             that want real results — not just a pretty page no one visits.
           </p>
         </div>
@@ -97,10 +133,10 @@ export function BenefitsSection() {
           {benefits.map((item, index) => (
             <div
               key={item.title}
-              className="group relative overflow-hidden rounded-3xl border border-slate-200/80 bg-card/90 p-6 sm:p-7 lg:p-8 shadow-[0_18px_60px_rgba(15,23,42,0.08)] transition-transform duration-400 hover:-translate-y-1.5"
+              className="group relative overflow-hidden rounded-3xl border border-slate-200/80 bg-white/90 backdrop-blur-xl p-6 sm:p-7 lg:p-8 shadow-[0_18px_60px_rgba(15,23,42,0.08)] transition-transform duration-400 hover:-translate-y-1.5"
               style={{ transitionDelay: `${index * 60}ms` }}
             >
-              {/* Glow de fundo bem sutil */}
+              {/* Glow sutil */}
               <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-sky-100/40 via-cyan-100/30 to-sky-100/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
               <div className="relative flex items-start gap-4">

@@ -1,75 +1,87 @@
 "use client"
 
+import * as React from "react"
 import { motion } from "framer-motion"
-import type { ReactNode } from "react"
 
 type FancySectionTitleProps = {
-  children: ReactNode
-  duration?: number
+  children: React.ReactNode
   className?: string
 }
 
-export function FancySectionTitle({
-  children,
-  duration = 2,
-  className = "",
-}: FancySectionTitleProps) {
-  const baseDuration = duration || 2
+export function FancySectionTitle({ children, className }: FancySectionTitleProps) {
+  // garante string
+  const text =
+    typeof children === "string"
+      ? children
+      : React.Children.toArray(children).join(" ")
+
+  const chars = Array.from(text)
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: baseDuration * 0.4, ease: [0.16, 1, 0.3, 1] }}
-      className={`relative inline-flex items-center justify-center ${className}`}
+      initial={{ opacity: 0, y: 18 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.35 }} // começa cedo no scroll
+      transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+      className={className}
     >
-      {/* Cápsula/contorno atrás do texto */}
-      <motion.div
-        className="absolute inset-0 rounded-full pointer-events-none"
-        initial={{ opacity: 0, scaleY: 0.2 }}
-        animate={{ opacity: 1, scaleY: 1 }}
-        transition={{
-          delay: baseDuration * 0.35,
-          duration: baseDuration * 0.45,
-          ease: [0.16, 1, 0.3, 1],
-        }}
-      >
-        {/* Borda em gradiente (parece caro) */}
-        <div className="absolute inset-0 rounded-full bg-gradient-to-r from-primary/70 via-primary/40 to-accent/70 opacity-80" />
-        {/* Fundo interno levemente translúcido pra não matar o background */}
-        <div className="absolute inset-[1.5px] rounded-full bg-background/80 backdrop-blur-sm" />
-      </motion.div>
+      <div className="relative inline-block">
+        {/* TÍTULO – FONTE GRANDE, COR FIXA */}
+        <span
+          className={[
+            "relative inline-block font-semibold tracking-tight",
+            "text-3xl sm:text-4xl md:text-5xl lg:text-6xl",
+            "text-sky-300 drop-shadow-[0_0_18px_rgba(56,189,248,0.55)]",
+          ].join(" ")}
+        >
+          {chars.map((ch, index) => {
+            if (ch === " ") {
+              return (
+                <span key={index} className="inline-block mx-[0.18em]">
+                  {" "}
+                </span>
+              )
+            }
 
-      {/* Underline que desenha antes da cápsula ficar óbvia */}
-      <motion.div
-        className="absolute left-4 right-4 bottom-1 h-[2px] rounded-full bg-gradient-to-r from-primary via-primary/80 to-accent origin-center"
-        initial={{ scaleX: 0 }}
-        animate={{ scaleX: 1 }}
-        transition={{
-          delay: baseDuration * 0.15,
-          duration: baseDuration * 0.4,
-          ease: [0.16, 1, 0.3, 1],
-        }}
-      />
-
-      {/* Glow bem sutil pra dar “luxo” */}
-      <motion.div
-        className="absolute inset-0 rounded-full pointer-events-none blur-xl bg-gradient-to-r from-primary/40 via-primary/0 to-accent/40"
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: [0, 0.6, 0], scale: [0.9, 1.02, 1] }}
-        transition={{
-          delay: baseDuration * 0.5,
-          duration: baseDuration * 0.7,
-          ease: "easeOut",
-        }}
-      />
-
-      {/* Texto em cima de tudo */}
-      <span className="relative z-10 px-6 py-2 text-3xl sm:text-4xl md:text-5xl font-semibold tracking-tight">
-        <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary via-primary/90 to-accent">
-          {children}
+            return (
+              <motion.span
+                key={index}
+                initial={{ opacity: 0, y: 20, filter: "blur(6px)" }}
+                whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                viewport={{ once: true, amount: 0.4 }}
+                transition={{
+                  duration: 0.4,
+                  ease: [0.16, 1, 0.3, 1],
+                  delay: index * 0.03, // efeito cascata
+                }}
+                className="inline-block"
+              >
+                {ch}
+              </motion.span>
+            )
+          })}
         </span>
-      </span>
+
+        {/* UNDERLINE NEON */}
+        <motion.span
+          className="pointer-events-none absolute left-0 right-0 -bottom-2 h-[3px] rounded-full"
+          initial={{ scaleX: 0, opacity: 0 }}
+          whileInView={{ scaleX: 1, opacity: 1 }}
+          viewport={{ once: true, amount: 0.4 }}
+          transition={{
+            duration: 0.5,
+            delay: chars.length * 0.03 - 0.1,
+            ease: [0.16, 1, 0.3, 1],
+          }}
+          style={{
+            transformOrigin: "left center",
+            background:
+              "linear-gradient(90deg, #1FA2FF, #12D8FA, #A6FFCB)",
+            boxShadow:
+              "0 0 12px rgba(56,189,248,0.9), 0 0 26px rgba(56,189,248,0.65)",
+          }}
+        />
+      </div>
     </motion.div>
   )
 }

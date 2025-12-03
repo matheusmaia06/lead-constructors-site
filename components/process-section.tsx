@@ -56,13 +56,8 @@ export function ProcessSection() {
       { threshold: 0.2 },
     )
 
-    const node = sectionRef.current
-    if (node) observer.observe(node)
-
-    return () => {
-      if (node) observer.unobserve(node)
-      observer.disconnect()
-    }
+    if (sectionRef.current) observer.observe(sectionRef.current)
+    return () => observer.disconnect()
   }, [])
 
   // scroll-sync para borda e tilt
@@ -79,18 +74,18 @@ export function ProcessSection() {
     <section
       ref={sectionRef}
       id="process"
-      className="w-full bg-background py-24 md:py-32 lg:py-40"
+      className="w-full bg-background pt-24 md:pt-32 lg:pt-40 pb-32 md:pb-40 lg:pb-48"
     >
       <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* HEADER DA SEÇÃO */}
-        <div className="mb-20">
+        <div className="mb-14 md:mb-16">
           <div className="section-title-wrapper">
             <h2
               className={`premium-title text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold transition-all duration-1000 ${
                 isVisible ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
               }`}
             >
-              <span className="premium-title-inner bg-gradient-to-r from-primary via-primary/90 to-accent bg-clip-text text-transparent">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-sky-500 to-emerald-400">
                 Move Fast + Make Things
               </span>
             </h2>
@@ -125,7 +120,7 @@ export function ProcessSection() {
                 style={{ transitionDelay: `${(index + 2) * 200}ms` }}
               >
                 {/* TEXTO */}
-                <div className={`space-y-6 ${index % 2 === 1 ? "lg:col-start-2" : ""}`}>
+                <div className={`${index % 2 === 1 ? "lg:col-start-2" : ""} space-y-6`}>
                   <div className="inline-flex items-center gap-4">
                     <span className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-2xl font-bold text-primary">
                       {index + 1}
@@ -148,30 +143,19 @@ export function ProcessSection() {
                 </div>
 
                 {/* QUADRADO ANIMADO */}
-                <div
-                  className={`relative ${
-                    index % 2 === 1 ? "lg:col-start-1 lg:row-start-1" : ""
-                  }`}
-                >
+                <div className={`${index % 2 === 1 ? "lg:col-start-1 lg:row-start-1" : ""} relative`}>
                   <div className="relative mx-auto aspect-square max-w-md">
                     {/* glow de fundo */}
                     <div className="absolute inset-0 rounded-[3rem] bg-gradient-to-br from-primary/25 via-accent/20 to-primary/30 blur-3xl" />
 
-                    {/* card com tilt + wow */}
+                    {/* card com tilt */}
                     <motion.div
                       className="group relative flex h-full items-center justify-center overflow-hidden rounded-[3rem] border border-border/40 bg-gradient-to-br from-card to-card/60 backdrop-blur-sm"
                       style={{ rotate: tilt }}
-                      whileHover={{
-                        scale: 1.03,
-                        y: -6,
-                      }}
-                      transition={{
-                        type: "spring",
-                        stiffness: 260,
-                        damping: 24,
-                      }}
+                      whileHover={{ scale: 1.03, y: -6 }}
+                      transition={{ type: "spring", stiffness: 260, damping: 24 }}
                     >
-                      {/* BORDA VIBRANTE QUE DESENHA */}
+                      {/* BORDA ANIMADA */}
                       <motion.svg
                         className="pointer-events-none absolute inset-0 h-full w-full"
                         viewBox="0 0 340 340"
@@ -190,7 +174,6 @@ export function ProcessSection() {
                           </linearGradient>
                         </defs>
 
-                        {/* borda de glow suave */}
                         <rect
                           x="20"
                           y="20"
@@ -202,7 +185,6 @@ export function ProcessSection() {
                           fill="none"
                         />
 
-                        {/* borda principal animada */}
                         <motion.rect
                           x="20"
                           y="20"
@@ -215,95 +197,72 @@ export function ProcessSection() {
                           strokeDasharray={BORDER_LENGTH}
                           style={{ strokeDashoffset: borderOffset }}
                           strokeLinecap="round"
-                          vectorEffect="non-scaling-stroke"
                         />
                       </motion.svg>
 
-                      {/* CONTEÚDO CENTRAL – GIFs + ícone fallback */}
+                      {/* CONTEÚDO CENTRAL */}
                       <div className="absolute inset-0 flex items-center justify-center p-6">
+                        {/* DISCOVERY.webm */}
                         {isDiscovery && (
-                          <motion.img
-                            src="/portfolio/processdiscovery.gif"
-                            alt="Discovery process animation"
+                          <motion.video
+                            autoPlay
+                            loop
+                            muted
+                            playsInline
                             className="h-full w-full rounded-[2.5rem] object-cover pointer-events-none"
                             initial={{ scale: 1.02 }}
                             animate={{ scale: [1.02, 1.08, 1.02] }}
-                            transition={{
-                              duration: 10,
-                              repeat: Infinity,
-                              ease: "easeInOut",
-                            }}
-                          />
+                            transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+                          >
+                            <source src="/portfolio/processdiscovery.webm" type="video/webm" />
+                          </motion.video>
                         )}
 
+                        {/* SODENBERG .webp */}
                         {isDesign && (
                           <motion.img
                             src="/portfolio/sodenberg.webp"
-                            alt="Design exploration animation"
+                            alt="Design process"
                             className="h-full w-full rounded-[2.5rem] object-cover pointer-events-none"
                             initial={{ scale: 1.02 }}
                             animate={{ scale: [1.02, 1.08, 1.02] }}
-                            transition={{
-                              duration: 10,
-                              repeat: Infinity,
-                              ease: "easeInOut",
-                            }}
+                            transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
                           />
                         )}
 
+                        {/* BUILD.webm */}
                         {isBuild && (
-                          <motion.img
-                            src="/portfolio/catcoding.gif"
-                            alt="Build & development animation"
+                          <motion.video
+                            autoPlay
+                            loop
+                            muted
+                            playsInline
                             className="h-full w-full rounded-[2.5rem] object-cover pointer-events-none"
                             initial={{ scale: 1.02 }}
                             animate={{ scale: [1.02, 1.07, 1.02] }}
-                            transition={{
-                              duration: 9,
-                              repeat: Infinity,
-                              ease: "easeInOut",
-                            }}
-                          />
+                            transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
+                          >
+                            <source src="/portfolio/catcoding.webm" type="video/webm" />
+                          </motion.video>
                         )}
 
+                        {/* LAUNCH.webm */}
                         {isLaunch && (
-                          <motion.img
-                            src="/portfolio/launchgif.gif"
-                            alt="Launch celebration animation"
+                          <motion.video
+                            autoPlay
+                            loop
+                            muted
+                            playsInline
                             className="h-full w-full rounded-[2.5rem] object-cover pointer-events-none"
                             initial={{ scale: 1.02, rotate: -1 }}
                             animate={{
                               scale: [1.02, 1.09, 1.02],
                               rotate: [-1, 1, -1],
                             }}
-                            transition={{
-                              duration: 8,
-                              repeat: Infinity,
-                              ease: "easeInOut",
-                            }}
-                          />
-                        )}
-
-                        {/* fallback pra futuros steps sem GIF */}
-                        {!isDiscovery && !isDesign && !isBuild && !isLaunch && (
-                          <motion.div
-                            className="flex items-center justify-center"
-                            initial={{ scale: 0.9, opacity: 0.85 }}
-                            animate={{
-                              scale: [0.9, 1, 0.97, 1],
-                              opacity: 1,
-                            }}
-                            transition={{
-                              duration: 8,
-                              repeat: Infinity,
-                              ease: "easeInOut",
-                            }}
+                            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
                           >
-                            <step.icon
-                              className="h-40 w-40 text-primary/70 drop-shadow-[0_0_18px_rgba(56,189,248,0.55)]"
-                              strokeWidth={0.7}
-                            />
-                          </motion.div>
+                            <source src="/portfolio/launchgif.webm" type="video/webm" />
+                          </motion.video>
                         )}
                       </div>
                     </motion.div>

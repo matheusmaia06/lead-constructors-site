@@ -1,6 +1,6 @@
-'use client'
+"use client"
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef } from "react"
 
 export function AnimatedBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -9,7 +9,7 @@ export function AnimatedBackground() {
     const canvas = canvasRef.current
     if (!canvas) return
 
-    const ctx = canvas.getContext('2d')
+    const ctx = canvas.getContext("2d")
     if (!ctx) return
 
     const setCanvasSize = () => {
@@ -17,7 +17,18 @@ export function AnimatedBackground() {
       canvas.height = window.innerHeight
     }
     setCanvasSize()
-    window.addEventListener('resize', setCanvasSize)
+    window.addEventListener("resize", setCanvasSize)
+
+    const isMobile = window.innerWidth < 768
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches
+
+    if (prefersReducedMotion) {
+      // Se o usuário prefere menos animação, não inicializamos o loop intenso
+      ctx.clearRect(0, 0, canvas.width, canvas.height)
+      return
+    }
 
     const particles: Array<{
       x: number
@@ -31,13 +42,13 @@ export function AnimatedBackground() {
     }> = []
 
     const colors = [
-      'rgba(99, 102, 241, ',   // primary blue
-      'rgba(96, 165, 250, ',   // light blue
-      'rgba(59, 130, 246, ',   // sky blue
-      'rgba(147, 197, 253, ',  // cyan
+      "rgba(99, 102, 241, ", // primary blue
+      "rgba(96, 165, 250, ", // light blue
+      "rgba(59, 130, 246, ", // sky blue
+      "rgba(147, 197, 253, ", // cyan
     ]
 
-    const particleCount = 250
+    const particleCount = isMobile ? 80 : 220
     for (let i = 0; i < particleCount; i++) {
       particles.push({
         x: Math.random() * canvas.width,
@@ -47,7 +58,7 @@ export function AnimatedBackground() {
         size: Math.random() * 3 + 1,
         opacity: Math.random() * 0.6 + 0.3,
         color: colors[Math.floor(Math.random() * colors.length)],
-        pulsePhase: Math.random() * Math.PI * 2
+        pulsePhase: Math.random() * Math.PI * 2,
       })
     }
 
@@ -69,17 +80,19 @@ export function AnimatedBackground() {
         vx: (Math.random() - 0.5) * 0.6,
         vy: (Math.random() - 0.5) * 0.6,
         size: Math.random() * 100 + 80,
-        opacity: Math.random() * 0.2 + 0.05,
+        opacity: Math.random() * 0.15 + 0.08,
         color: colors[Math.floor(Math.random() * colors.length)],
-        pulseSpeed: Math.random() * 0.02 + 0.01
+        pulseSpeed: Math.random() * 0.03 + 0.01,
       })
     }
 
     let animationFrameId: number
     let time = 0
-    
+
     const animate = () => {
-      time += 0.016
+      animationFrameId = requestAnimationFrame(animate)
+      time += 0.01
+
       ctx.clearRect(0, 0, canvas.width, canvas.height)
 
       orbs.forEach((orb) => {
@@ -94,11 +107,21 @@ export function AnimatedBackground() {
         const pulse = Math.sin(time * orb.pulseSpeed) * 0.3 + 1
         const currentSize = orb.size * pulse
 
-        const gradient = ctx.createRadialGradient(orb.x, orb.y, 0, orb.x, orb.y, currentSize)
+        const gradient = ctx.createRadialGradient(
+          orb.x,
+          orb.y,
+          0,
+          orb.x,
+          orb.y,
+          currentSize,
+        )
         gradient.addColorStop(0, `${orb.color}${orb.opacity * pulse})`)
-        gradient.addColorStop(0.5, `${orb.color}${orb.opacity * 0.5 * pulse})`)
+        gradient.addColorStop(
+          0.5,
+          `${orb.color}${orb.opacity * 0.5 * pulse})`,
+        )
         gradient.addColorStop(1, `${orb.color}0)`)
-        
+
         ctx.beginPath()
         ctx.arc(orb.x, orb.y, currentSize, 0, Math.PI * 2)
         ctx.fillStyle = gradient
@@ -120,7 +143,7 @@ export function AnimatedBackground() {
         const currentOpacity = particle.opacity * pulse
 
         ctx.shadowBlur = 12
-        ctx.shadowColor = particle.color + currentOpacity + ')'
+        ctx.shadowColor = particle.color + currentOpacity + ")"
         ctx.beginPath()
         ctx.arc(particle.x, particle.y, currentSize, 0, Math.PI * 2)
         ctx.fillStyle = `${particle.color}${currentOpacity})`
@@ -132,24 +155,24 @@ export function AnimatedBackground() {
           const dy = particle.y - otherParticle.y
           const distance = Math.sqrt(dx * dx + dy * dy)
 
-          if (distance < 250) {
+          if (distance < (isMobile ? 140 : 250)) {
             ctx.beginPath()
             ctx.moveTo(particle.x, particle.y)
             ctx.lineTo(otherParticle.x, otherParticle.y)
-            const lineOpacity = 0.3 * (1 - distance / 250)
+            const lineOpacity =
+              0.3 * (1 - distance / (isMobile ? 140 : 250))
             ctx.strokeStyle = `${particle.color}${lineOpacity})`
             ctx.lineWidth = 2
             ctx.stroke()
           }
         })
       })
-
-      animationFrameId = requestAnimationFrame(animate)
     }
+
     animate()
 
     return () => {
-      window.removeEventListener('resize', setCanvasSize)
+      window.removeEventListener("resize", setCanvasSize)
       cancelAnimationFrame(animationFrameId)
     }
   }, [])
@@ -158,7 +181,7 @@ export function AnimatedBackground() {
     <canvas
       ref={canvasRef}
       className="pointer-events-none absolute inset-0 opacity-60"
-      style={{ mixBlendMode: 'screen' }}
+      style={{ mixBlendMode: "screen" }}
     />
   )
 }

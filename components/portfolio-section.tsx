@@ -102,7 +102,6 @@ const caseStudies: CaseItem[] = [
     fit: "contain",
     country: "United States",
   },
-  // futuramente: case-8, case-9, case-10
 ]
 
 const ITEMS_PER_PAGE_DESKTOP = 3
@@ -128,7 +127,7 @@ export function PortfolioSection() {
   const goPrev = () => {
     if (page === 0) return
     setDirection("prev")
-    setPage((prev) => clampPage(prev - 1))
+    setPage(prev => clampPage(prev - 1))
     setLeftArrowPulse(true)
     setTimeout(() => setLeftArrowPulse(false), 550)
   }
@@ -136,7 +135,7 @@ export function PortfolioSection() {
   const goNext = () => {
     if (page === totalPages - 1) return
     setDirection("next")
-    setPage((prev) => clampPage(prev + 1))
+    setPage(prev => clampPage(prev + 1))
     setRightArrowPulse(true)
     setTimeout(() => setRightArrowPulse(false), 550)
   }
@@ -147,13 +146,7 @@ export function PortfolioSection() {
     setPage(clampPage(p))
   }
 
-  const startIndex = page * ITEMS_PER_PAGE_DESKTOP
-  const currentSlice = caseStudies.slice(
-    startIndex,
-    startIndex + ITEMS_PER_PAGE_DESKTOP,
-  )
-
-  // animação de entrada dos cards quando o page muda
+  // animação leve na troca de página
   useEffect(() => {
     setAnimState("enter")
     const id = requestAnimationFrame(() => {
@@ -173,10 +166,8 @@ export function PortfolioSection() {
     const threshold = 50
 
     if (deltaX > threshold) {
-      // swipe right → volta
       goPrev()
     } else if (deltaX < -threshold) {
-      // swipe left → avança
       goNext()
     }
 
@@ -188,8 +179,8 @@ export function PortfolioSection() {
   const gridAnimClass =
     animState === "enter"
       ? direction === "next"
-        ? "opacity-0 translate-x-6"
-        : "opacity-0 -translate-x-6"
+        ? "opacity-0 translate-x-4"
+        : "opacity-0 -translate-x-4"
       : "opacity-100 translate-x-0"
 
   return (
@@ -197,7 +188,7 @@ export function PortfolioSection() {
       id="case-studies"
       className="relative w-full overflow-hidden py-20 sm:py-24"
     >
-      {/* subtle background */}
+      {/* background */}
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute inset-0 bg-background" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(56,189,248,0.12),transparent_55%),radial-gradient(circle_at_bottom,_rgba(34,197,94,0.10),transparent_55%)]" />
@@ -215,7 +206,7 @@ export function PortfolioSection() {
             <div>
               <h2 className="text-balance text-3xl font-bold leading-tight tracking-tight sm:text-4xl">
                 Real projects.{" "}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-sky-500 to-emerald-400">
+                <span className="bg-gradient-to-r from-cyan-400 via-sky-500 to-emerald-400 bg-clip-text text-transparent">
                   Real business impact.
                 </span>
               </h2>
@@ -235,7 +226,6 @@ export function PortfolioSection() {
                 of {totalPages} · {totalItems} cases total
               </span>
             </div>
-            {/* desktop dots */}
             <div className="hidden gap-1 md:flex">
               {Array.from({ length: totalPages }).map((_, i) => {
                 const isActive = i === page
@@ -257,13 +247,13 @@ export function PortfolioSection() {
           </div>
         </div>
 
-        {/* SET BOXES + ARROWS + SWIPE */}
+        {/* CARROSSEL + SETAS */}
         <div
           className="flex items-stretch gap-4"
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
         >
-          {/* seta esquerda (desktop) */}
+          {/* seta esquerda desktop */}
           <div className="hidden items-center md:flex">
             <button
               type="button"
@@ -277,74 +267,134 @@ export function PortfolioSection() {
             </button>
           </div>
 
-          {/* cards */}
-          <div
-            className={`grid flex-1 gap-5 md:grid-cols-3 transform transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${gridAnimClass}`}
-          >
-            {currentSlice.map((item, index) => (
-              <article
-                key={item.id}
-                className="group flex flex-col overflow-hidden rounded-2xl border border-border/70 bg-background/90 shadow-[0_14px_45px_rgba(15,23,42,0.55)] transition-all hover:-translate-y-1.5 hover:border-primary/60 hover:bg-background hover:shadow-[0_20px_70px_rgba(15,23,42,0.85)]"
-              >
-                <div className="relative w-full overflow-hidden">
-                  <div className="relative aspect-[4/3] w-full">
-                    <Image
-                      src={item.image || "/placeholder.svg"}
-                      alt={`${item.name} website`}
-                      fill
-                      className={`transition-transform duration-700 group-hover:scale-[1.04] ${
-                        item.fit === "contain"
-                          ? "object-contain bg-black"
-                          : "object-cover"
-                      }`}
-                      sizes="(min-width: 1024px) 20rem, 100vw"
-                    />
-                  </div>
-                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80" />
+          {/* TRACK */}
+          <div className="relative flex-1 overflow-hidden">
+            <div
+              className={`flex w-full transform transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${gridAnimClass}`}
+              style={{ transform: `translateX(-${page * 100}%)` }}
+            >
+              {Array.from({ length: totalPages }).map((_, pageIndex) => {
+                const sliceStart = pageIndex * ITEMS_PER_PAGE_DESKTOP
+                const slice = caseStudies.slice(
+                  sliceStart,
+                  sliceStart + ITEMS_PER_PAGE_DESKTOP,
+                )
+                const remainingSlots =
+                  ITEMS_PER_PAGE_DESKTOP - slice.length
 
-                  <div className="absolute inset-x-4 bottom-3 flex items-center justify-between gap-3">
-                    <div className="space-y-1">
-                      <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-300">
-                        Case {String(startIndex + index + 1).padStart(2, "0")}
-                      </p>
-                      <p className="text-xs font-medium text-slate-50 line-clamp-1">
-                        {item.name}
-                      </p>
-                    </div>
-                    <span className="rounded-full bg-white/95 px-3 py-1 text-[10px] font-semibold text-slate-900 shadow-sm">
-                      View live
-                    </span>
-                  </div>
-                </div>
+                return (
+                  <div
+                    key={pageIndex}
+                    className="grid w-full flex-shrink-0 gap-5 md:grid-cols-3"
+                  >
+                    {slice.map((item, index) => (
+                      <article
+                        key={item.id}
+                        className="group flex flex-col overflow-hidden rounded-2xl border border-border/70 bg-background/90 shadow-[0_14px_45px_rgba(15,23,42,0.55)] transition-all hover:-translate-y-1.5 hover:border-primary/60 hover:bg-background hover:shadow-[0_20px_70px_rgba(15,23,42,0.85)]"
+                      >
+                        <div className="relative w-full overflow-hidden">
+                          <div className="relative aspect-[4/3] w-full">
+                            <Image
+                              src={item.image || "/placeholder.svg"}
+                              alt={`${item.name} website`}
+                              fill
+                              className={`transition-transform duration-700 group-hover:scale-[1.04] ${
+                                item.fit === "contain"
+                                  ? "object-contain bg-black"
+                                  : "object-cover"
+                              }`}
+                              sizes="(min-width: 1024px) 20rem, 100vw"
+                            />
+                          </div>
+                          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80" />
 
-                <div className="flex flex-1 flex-col gap-2 px-4 pb-4 pt-3 sm:px-5 sm:pb-5">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
-                    {item.category}
-                  </p>
-                  <p className="text-sm text-foreground line-clamp-3">
-                    {item.summary}
-                  </p>
-                  <p className="text-xs font-medium text-emerald-500/90">
-                    {item.impact}
-                  </p>
+                          <div className="absolute inset-x-4 bottom-3 flex items-center justify-between gap-3">
+                            <div className="space-y-1">
+                              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-300">
+                                Case{" "}
+                                {String(sliceStart + index + 1).padStart(
+                                  2,
+                                  "0",
+                                )}
+                              </p>
+                              <p className="text-xs font-medium text-slate-50 line-clamp-1">
+                                {item.name}
+                              </p>
+                            </div>
+                            <span className="rounded-full bg-white/95 px-3 py-1 text-[10px] font-semibold text-slate-900 shadow-sm">
+                              View live
+                            </span>
+                          </div>
+                        </div>
 
-                  <div className="mt-auto pt-2">
-                    <a
-                      href={item.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-xs font-semibold text-primary transition-colors hover:text-primary/80"
-                    >
-                      <span>Open case</span>
-                      <ExternalLink className="h-3.5 w-3.5" />
-                    </a>
+                        <div className="flex flex-1 flex-col gap-2 px-4 pb-4 pt-3 sm:px-5 sm:pb-5">
+                          <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
+                            {item.category}
+                          </p>
+                          <p className="text-sm text-foreground line-clamp-3">
+                            {item.summary}
+                          </p>
+                          <p className="text-xs font-medium text-emerald-500/90">
+                            {item.impact}
+                          </p>
+
+                          <div className="mt-auto pt-2">
+                            <a
+                              href={item.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1 text-xs font-semibold text-primary transition-colors hover:text-primary/80"
+                            >
+                              <span>Open case</span>
+                              <ExternalLink className="h-3.5 w-3.5" />
+                            </a>
+                          </div>
+                        </div>
+                      </article>
+                    ))}
+
+                    {/* BLOCO 150+ NO LUGAR DOS CASES 8/9 NA ÚLTIMA PÁGINA (DESKTOP) */}
+                    {pageIndex === page &&
+                      pageIndex === totalPages - 1 &&
+                      remainingSlots > 0 && (
+                        <div className="hidden md:flex md:col-span-2">
+                          <div className="highlight-150-card relative flex w-full flex-col justify-center overflow-hidden rounded-2xl border border-border/70 bg-background/80 px-8 py-10 shadow-[0_14px_45px_rgba(15,23,42,0.45)]">
+                            {/* glows de fundo */}
+                            <div className="pointer-events-none absolute inset-0 opacity-70">
+                              <div className="absolute -left-10 top-0 h-40 w-40 rounded-full bg-cyan-500/8 blur-3xl" />
+                              <div className="absolute bottom-0 right-[-40px] h-44 w-44 rounded-full bg-emerald-400/8 blur-3xl" />
+                            </div>
+
+                            <div className="relative space-y-4">
+                              <p className="text-[11px] font-semibold uppercase tracking-[0.26em] text-muted-foreground/80">
+                                Global footprint
+                              </p>
+
+                              <p className="highlight-150-main text-base sm:text-lg md:text-xl font-semibold leading-relaxed">
+                                <span className="bg-gradient-to-r from-cyan-400 via-sky-500 to-emerald-400 bg-clip-text text-transparent">
+                                  150+ projects delivered across 5 countries —
+                                  Canada, Spain, Brazil, the United States and
+                                  the United Kingdom.
+                                </span>
+                              </p>
+
+                              <div className="highlight-150-bar mt-1 h-[3px] w-32 rounded-full bg-gradient-to-r from-cyan-400 via-sky-500 to-emerald-400 shadow-[0_0_14px_rgba(56,189,248,0.85)]" />
+
+                              <p className="max-w-xl text-xs sm:text-sm text-muted-foreground leading-relaxed">
+                                From boutique brands to global teams, we design
+                                experiences that travel well.
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      )}
                   </div>
-                </div>
-              </article>
-            ))}
+                )
+              })}
+            </div>
           </div>
 
-          {/* seta direita (desktop) */}
+          {/* seta direita desktop */}
           <div className="hidden items-center md:flex">
             <button
               type="button"
@@ -359,25 +409,30 @@ export function PortfolioSection() {
           </div>
         </div>
 
-        {/* highlight de 150+ projetos – aparece no último set, com animação */}
+        {/* HIGHLIGHT 150+ – MOBILE / TABLET */}
         <div
-          className={`mx-auto mt-2 max-w-3xl text-center text-sm sm:text-base md:text-lg font-medium text-primary/90 transition-all duration-600 ease-out ${
+          className={`mx-auto mt-6 max-w-3xl text-center transition-all duration-600 ease-out md:hidden ${
             isLastPage
               ? "opacity-100 translate-y-0"
               : "pointer-events-none opacity-0 translate-y-2"
           }`}
         >
-          <span className="bg-gradient-to-r from-cyan-400 via-sky-500 to-emerald-400 bg-clip-text text-transparent">
-            150+ projects delivered across 5 countries — Canada, Spain, Brazil,
-            the United States and the United Kingdom.
-          </span>{" "}
-          <span className="block text-xs sm:text-sm text-muted-foreground mt-1">
+          <p className="highlight-150-main text-base sm:text-lg font-semibold leading-relaxed">
+            <span className="bg-gradient-to-r from-cyan-400 via-sky-500 to-emerald-400 bg-clip-text text-transparent">
+              150+ projects delivered across 5 countries — Canada, Spain,
+              Brazil, the United States and the United Kingdom.
+            </span>
+          </p>
+
+          <div className="highlight-150-bar mx-auto mt-2 h-[3px] w-28 rounded-full bg-gradient-to-r from-cyan-400 via-sky-500 to-emerald-400 shadow-[0_0_12px_rgba(56,189,248,0.85)]" />
+
+          <p className="mt-3 text-xs sm:text-sm text-muted-foreground leading-relaxed">
             From boutique brands to global teams, we design experiences that
             travel well.
-          </span>
+          </p>
         </div>
 
-        {/* navegação mobile (setas + dots) */}
+        {/* navegação mobile */}
         <div className="mt-4 flex items-center justify-center gap-4 md:hidden">
           <button
             type="button"
@@ -422,7 +477,7 @@ export function PortfolioSection() {
         </div>
       </div>
 
-      {/* estilos locais para o ripple das setas */}
+      {/* estilos locais */}
       <style jsx>{`
         .arrow-ripple {
           position: relative;
@@ -449,6 +504,42 @@ export function PortfolioSection() {
           100% {
             transform: scale(1.8);
             opacity: 0;
+          }
+        }
+
+        .highlight-150-card {
+          position: relative;
+        }
+
+        .highlight-150-main {
+          opacity: 0;
+          transform: translateY(6px);
+          animation: highlightTextFade 0.7s ease-out forwards;
+        }
+
+        .highlight-150-bar {
+          transform-origin: left center;
+          transform: scaleX(0);
+          animation: highlightBarGrow 0.85s 0.15s ease-out forwards;
+        }
+
+        @keyframes highlightTextFade {
+          0% {
+            opacity: 0;
+            transform: translateY(6px);
+          }
+          100% {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        @keyframes highlightBarGrow {
+          0% {
+            transform: scaleX(0);
+          }
+          100% {
+            transform: scaleX(1);
           }
         }
       `}</style>

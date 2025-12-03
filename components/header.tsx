@@ -13,6 +13,7 @@ export function Header() {
   const [scrolled, setScrolled] = useState(false)
   const [showHeader, setShowHeader] = useState(false)
   const [pageProgress, setPageProgress] = useState(0)
+  const [isMobile, setIsMobile] = useState(false)
 
   // baseline de scroll quando o header aparece pela primeira vez
   const [baselineScroll, setBaselineScroll] = useState<number | null>(null)
@@ -26,10 +27,37 @@ export function Header() {
   ]
 
   useEffect(() => {
+    const updateIsMobile = () => {
+      if (typeof window === "undefined") return
+      setIsMobile(window.innerWidth < 768)
+    }
+
+    updateIsMobile()
+    window.addEventListener("resize", updateIsMobile)
+    return () => window.removeEventListener("resize", updateIsMobile)
+  }, [])
+
+  useEffect(() => {
     const handleScroll = () => {
       const scrollY = window.scrollY
-      const heroDistance = window.innerHeight * HERO_PIN_MULTIPLIER
+      const docHeight =
+        document.documentElement.scrollHeight - window.innerHeight
 
+      if (isMobile) {
+        // No mobile, o header fica sempre visível e usamos um progresso simples da página toda
+        setShowHeader(true)
+        setScrolled(scrollY > 16)
+
+        if (docHeight > 0) {
+          setPageProgress(Math.min(scrollY / docHeight, 1))
+        } else {
+          setPageProgress(0)
+        }
+
+        return
+      }
+
+      const heroDistance = window.innerHeight * HERO_PIN_MULTIPLIER
       const heroProgress = Math.min(scrollY / heroDistance, 1)
       const shouldShowHeader = heroProgress >= 0.9
 
@@ -43,9 +71,6 @@ export function Header() {
         // se voltar pro topo/hero, resetamos
         setBaselineScroll(null)
       }
-
-      const docHeight =
-        document.documentElement.scrollHeight - window.innerHeight
 
       if (!shouldShowHeader || docHeight <= 0 || baselineScroll === null) {
         setPageProgress(0)
@@ -72,7 +97,7 @@ export function Header() {
       window.removeEventListener("scroll", handleScroll)
       window.removeEventListener("resize", handleScroll)
     }
-  }, [baselineScroll])
+  }, [baselineScroll, isMobile])
 
   const scrollToSection = (href: string) => {
     const target = document.querySelector(href)
@@ -92,79 +117,78 @@ export function Header() {
     "fixed left-0 right-0 top-0 z-40 transition-colors duration-500"
   const visibilityClasses = showHeader
     ? "pointer-events-auto"
-    : "pointer-events-none"
-
-  const styleClasses = scrolled
-    ? "bg-[#020817]/98 backdrop-blur-lg border-b border-sky-500/15 shadow-[0_16px_40px_rgba(0,0,0,0.85)]"
-    : "bg-gradient-to-b from-[#020b1f]/95 via-[#020818]/92 to-[#020817]/90 backdrop-blur-md border-b border-sky-500/10"
+    : "pointer-events-none opacity-0 -translate-y-4"
+  const scrolledClasses = scrolled
+    ? "bg-slate-950/90 backdrop-blur-xl border-b border-slate-800/60 shadow-lg shadow-slate-900/60"
+    : "bg-gradient-to-b from-slate-950/80 via-slate-950/30 to-transparent border-b border-transparent"
 
   return (
     <motion.header
       initial={{ opacity: 0, y: -16 }}
-      animate={
-        showHeader
-          ? { opacity: 1, y: 0 }
-          : { opacity: 0, y: -16 }
-      }
-      transition={{ duration: 0.45, ease: "easeOut" }}
-      className={[baseClasses, visibilityClasses, styleClasses].join(" ")}
+      animate={showHeader ? { opacity: 1, y: 0 } : { opacity: 0, y: -16 }}
+      transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+      className={`${baseClasses} ${visibilityClasses} ${scrolledClasses}`}
     >
-      {/* Barra de progresso */}
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[1.5px] bg-transparent">
-        <div
-          className="h-full origin-left bg-gradient-to-r from-sky-500 via-cyan-400 to-emerald-400 transition-transform duration-150"
-          style={{ transform: `scaleX(${pageProgress})` }}
-        />
-      </div>
+      <div className="mx-auto flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
+{/* Logo – full wordmark, no extra text */}
+{/* Logo – full width, much larger */}
+<button
+  type="button"
+  onClick={() => scrollToSection("#top")}
+  className="flex items-center"
+>
+  <div className="relative h-[42px] sm:h-[48px] w-[240px] sm:w-[300px]">
+    <Image
+      src="/lead-constructors-logo-3.png"
+      alt="Lead Constructors"
+      fill
+      className="object-contain"
+      priority
+    />
+  </div>
+</button>
 
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
-        {/* LOGO DESTACADA */}
-        <button
-          type="button"
-          onClick={() => scrollToSection("#top")}
-          className="group relative flex items-center"
-        >
-          {/* Glow */}
-          <div className="absolute -inset-3 rounded-2xl bg-[radial-gradient(circle_at_center,rgba(45,212,191,0.5),transparent_60%)] opacity-60 blur-xl group-hover:opacity-90 group-hover:blur-[38px] transition-all" />
 
-          {/* Logo */}
-          <div className="relative h-12 w-12 sm:h-14 sm:w-14">
-            <Image
-              src="/lead-constructors-logo.png"
-              alt="Lead Constructors"
-              fill
-              sizes="60px"
-              className="object-contain drop-shadow-[0_0_22px_rgba(56,189,248,0.95)] group-hover:drop-shadow-[0_0_32px_rgba(56,189,248,1)] transition-all"
-            />
-          </div>
-        </button>
 
-        {/* NAV DESKTOP */}
-        <nav className="hidden items-center gap-8 md:flex">
-          {links.map((item) => (
+        {/* Navegação desktop */}
+        <nav className="hidden md:flex items-center gap-8 text-sm">
+          {links.map((link) => (
             <button
-              key={item.href}
+              key={link.href}
               type="button"
-              onClick={() => scrollToSection(item.href)}
-              className="group relative text-sm font-medium text-slate-100/90 hover:text-teal-300 transition-colors"
+              onClick={() => scrollToSection(link.href)}
+              className="text-slate-200/80 hover:text-sky-300 transition-colors"
             >
-              <span>{item.label}</span>
-              <span className="pointer-events-none absolute inset-x-0 -bottom-1 h-px origin-center scale-x-0 bg-gradient-to-r from-sky-500 via-cyan-400 to-emerald-400 transition-transform duration-200 group-hover:scale-x-100" />
+              {link.label}
             </button>
           ))}
-
-          <Button
-            type="button"
-            className="relative overflow-hidden rounded-full bg-gradient-to-r from-sky-500 via-cyan-400 to-emerald-400 px-5 text-sm font-semibold text-slate-950 shadow-lg shadow-sky-500/35 transition-all hover:-translate-y-[1px] hover:shadow-sky-400/50"
-            onClick={() => scrollToSection("#cta")}
-          >
-            <span className="relative z-10">Get Started</span>
-          </Button>
         </nav>
 
-        {/* HAMBURGUER MOBILE */}
+        {/* CTA desktop */}
+        <div className="hidden md:flex items-center gap-3">
+          <Button
+            size="sm"
+            variant="outline"
+            className="border-slate-700/70 bg-slate-950/70 text-slate-100 hover:bg-slate-900"
+            onClick={() => scrollToSection("#portfolio")}
+          >
+            View Work
+          </Button>
+<Button
+  size="sm"
+  className="group relative overflow-hidden rounded-full bg-gradient-to-r from-sky-500 via-cyan-400 to-emerald-400 px-5 py-2 text-sm font-semibold text-slate-950 shadow-lg shadow-sky-500/40 transition-all hover:-translate-y-[1px] hover:shadow-sky-400/60"
+  onClick={() => scrollToSection("#cta")}
+>
+  <span className="relative z-10">Get Started</span>
+  <span className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-r from-sky-400 via-cyan-300 to-emerald-300" />
+</Button>
+
+        </div>
+
+        {/* Botão menu mobile */}
         <button
-          className="inline-flex items-center justify-center rounded-full border border-slate-700/70 bg-slate-900/70 p-2 text-slate-100 shadow-sm hover:bg-slate-800/90 md:hidden"
+          type="button"
+          className="inline-flex items-center justify-center rounded-full border border-slate-700/80 bg-slate-950/80 p-2 text-slate-100 hover:bg-slate-900 md:hidden"
           onClick={() => setIsOpen((prev) => !prev)}
         >
           {isOpen ? (
@@ -173,39 +197,45 @@ export function Header() {
             <Menu className="h-5 w-5" />
           )}
         </button>
+      </div>
 
-        {/* MENU MOBILE */}
-        {isOpen && (
-          <div className="absolute inset-x-4 top-[3.25rem] z-40 rounded-2xl border border-slate-700/80 bg-[#020818]/98 p-4 shadow-2xl shadow-black/80 md:hidden">
-            <nav className="flex flex-col gap-2">
-              {links.map((item) => (
-                <button
-                  key={item.href}
-                  type="button"
-                  onClick={() => {
-                    scrollToSection(item.href)
-                    setIsOpen(false)
-                  }}
-                  className="rounded-xl px-3 py-2 text-sm font-medium text-slate-100 hover:bg-slate-900/80 hover:text-teal-300 transition-colors text-left"
-                >
-                  {item.label}
-                </button>
-              ))}
+      {/* Progress bar */}
+      <div className="h-0.5 w-full bg-slate-900/80">
+        <div
+          className="h-full bg-gradient-to-r from-sky-500 via-cyan-400 to-emerald-400 transition-all duration-300"
+          style={{ width: `${pageProgress * 100}%` }}
+        />
+      </div>
 
-              <Button
+      {/* Menu mobile */}
+      {isOpen && (
+        <div className="border-t border-slate-800/70 bg-slate-950/95 backdrop-blur-xl md:hidden">
+          <div className="mx-auto flex flex-col gap-2 px-4 py-3 sm:px-6 lg:px-8">
+            {links.map((link) => (
+              <button
+                key={link.href}
                 type="button"
-                className="mt-3 w-full rounded-full bg-gradient-to-r from-sky-500 via-cyan-400 to-emerald-400 text-sm font-semibold"
                 onClick={() => {
-                  scrollToSection("#cta")
+                  scrollToSection(link.href)
                   setIsOpen(false)
                 }}
+                className="w-full rounded-lg px-3 py-2 text-left text-sm text-slate-100 hover:bg-slate-900/80"
               >
-                Get Started
-              </Button>
-            </nav>
+                {link.label}
+              </button>
+            ))}
+            <Button
+              className="mt-3 w-full rounded-full bg-gradient-to-r from-sky-500 via-cyan-400 to-emerald-400 text-sm font-semibold"
+              onClick={() => {
+                scrollToSection("#cta")
+                setIsOpen(false)
+              }}
+            >
+              Get Started
+            </Button>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </motion.header>
   )
 }
