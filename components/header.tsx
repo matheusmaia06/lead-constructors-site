@@ -6,8 +6,6 @@ import { Menu, X } from "lucide-react"
 import { motion } from "framer-motion"
 import Image from "next/image"
 
-const HERO_PIN_MULTIPLIER = 8
-
 export function Header() {
   const [isOpen, setIsOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
@@ -23,7 +21,8 @@ export function Header() {
     { label: "Solutions", href: "#services" },
     { label: "Work", href: "#portfolio" },
     { label: "Process", href: "#process" },
-    { label: "FAQ", href: "#faq" },
+    // mantém o label FAQ, mas aponta para uma seção existente
+    { label: "FAQ", href: "#pricing" },
   ]
 
   useEffect(() => {
@@ -43,8 +42,8 @@ export function Header() {
       const docHeight =
         document.documentElement.scrollHeight - window.innerHeight
 
+      // MOBILE: header sempre visível, como já estava
       if (isMobile) {
-        // No mobile, o header fica sempre visível e usamos um progresso simples da página toda
         setShowHeader(true)
         setScrolled(scrollY > 16)
 
@@ -57,18 +56,19 @@ export function Header() {
         return
       }
 
-      const heroDistance = window.innerHeight * HERO_PIN_MULTIPLIER
-      const heroProgress = Math.min(scrollY / heroDistance, 1)
-      const shouldShowHeader = heroProgress >= 0.9
+      // DESKTOP: header aparece quando já saímos visualmente do hero
+      // ~1 viewport de rolagem
+      const heroViewportThreshold = window.innerHeight * 0.9
+      const shouldShowHeader = scrollY >= heroViewportThreshold
 
       setShowHeader(shouldShowHeader)
-      setScrolled(scrollY > heroDistance * 0.95)
+      setScrolled(scrollY > heroViewportThreshold + 16)
 
-      // quando o header for mostrado pela primeira vez, travamos o baseline
       if (shouldShowHeader) {
-        setBaselineScroll((prev) => (prev === null ? scrollY : prev))
+        // travamos o baseline na primeira vez que o header aparece
+        setBaselineScroll(prev => (prev === null ? scrollY : prev))
       } else {
-        // se voltar pro topo/hero, resetamos
+        // se voltamos pro topo/hero, resetamos baseline
         setBaselineScroll(null)
       }
 
@@ -130,29 +130,26 @@ export function Header() {
       className={`${baseClasses} ${visibilityClasses} ${scrolledClasses}`}
     >
       <div className="mx-auto flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
-{/* Logo – full wordmark, no extra text */}
-{/* Logo – full width, much larger */}
-<button
-  type="button"
-  onClick={() => scrollToSection("#top")}
-  className="flex items-center"
->
-  <div className="relative h-[42px] sm:h-[48px] w-[240px] sm:w-[300px]">
-    <Image
-      src="/lead-constructors-logo-3.png"
-      alt="Lead Constructors"
-      fill
-      className="object-contain"
-      priority
-    />
-  </div>
-</button>
-
-
+        {/* Logo – wordmark grande */}
+        <button
+          type="button"
+          onClick={() => scrollToSection("#top")}
+          className="flex items-center"
+        >
+          <div className="relative h-[48px] sm:h-[54px] w-[260px] sm:w-[320px]">
+            <Image
+              src="/lead-constructors-logo-3.png"
+              alt="Lead Constructors"
+              fill
+              className="object-contain"
+              priority
+            />
+          </div>
+        </button>
 
         {/* Navegação desktop */}
         <nav className="hidden md:flex items-center gap-8 text-sm">
-          {links.map((link) => (
+          {links.map(link => (
             <button
               key={link.href}
               type="button"
@@ -172,24 +169,23 @@ export function Header() {
             className="border-slate-700/70 bg-slate-950/70 text-slate-100 hover:bg-slate-900"
             onClick={() => scrollToSection("#portfolio")}
           >
-            View Work
+            View work
           </Button>
-<Button
-  size="sm"
-  className="group relative overflow-hidden rounded-full bg-gradient-to-r from-sky-500 via-cyan-400 to-emerald-400 px-5 py-2 text-sm font-semibold text-slate-950 shadow-lg shadow-sky-500/40 transition-all hover:-translate-y-[1px] hover:shadow-sky-400/60"
-  onClick={() => scrollToSection("#cta")}
->
-  <span className="relative z-10">Get Started</span>
-  <span className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-r from-sky-400 via-cyan-300 to-emerald-300" />
-</Button>
-
+          <Button
+            size="sm"
+            className="group relative overflow-hidden rounded-full bg-gradient-to-r from-sky-500 via-cyan-400 to-emerald-400 px-5 py-2 text-sm font-semibold text-slate-950 shadow-lg shadow-sky-500/40 transition-all hover:-translate-y-[1px] hover:shadow-sky-400/60"
+            onClick={() => scrollToSection("#cta")}
+          >
+            <span className="relative z-10">Get started</span>
+            <span className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-r from-sky-400 via-cyan-300 to-emerald-300" />
+          </Button>
         </div>
 
         {/* Botão menu mobile */}
         <button
           type="button"
           className="inline-flex items-center justify-center rounded-full border border-slate-700/80 bg-slate-950/80 p-2 text-slate-100 hover:bg-slate-900 md:hidden"
-          onClick={() => setIsOpen((prev) => !prev)}
+          onClick={() => setIsOpen(prev => !prev)}
         >
           {isOpen ? (
             <X className="h-5 w-5" />
@@ -211,7 +207,7 @@ export function Header() {
       {isOpen && (
         <div className="border-t border-slate-800/70 bg-slate-950/95 backdrop-blur-xl md:hidden">
           <div className="mx-auto flex flex-col gap-2 px-4 py-3 sm:px-6 lg:px-8">
-            {links.map((link) => (
+            {links.map(link => (
               <button
                 key={link.href}
                 type="button"
@@ -231,7 +227,7 @@ export function Header() {
                 setIsOpen(false)
               }}
             >
-              Get Started
+              Get started
             </Button>
           </div>
         </div>

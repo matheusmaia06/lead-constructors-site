@@ -13,7 +13,7 @@ import { AnimatedBackground } from "@/components/animated-background"
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen relative">
+    <div id="top" className="min-h-screen relative">
       <AnimatedBackground />
       <Header />
       <main>
