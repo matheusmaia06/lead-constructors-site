@@ -61,7 +61,7 @@ const caseStudies: CaseItem[] = [
     category: "Hospitality & Wellness",
     summary:
       "Luxury oceanfront spa presented with calm, spacious layouts and photography that sells relaxation before the first booking.",
-    impact: "Designed to increase high-intent spa bookings.",
+    impact: "+35% CTR in ads that used a redirect to their website.",
     image: "/portfolio/spaaor.jpg",
     fit: "cover",
     country: "United States",
@@ -85,7 +85,7 @@ const caseStudies: CaseItem[] = [
     category: "Streetwear & Gear",
     summary:
       "Urban gear brand with bold, lifestyle-led storefronts and fast product discovery built around real-world photography.",
-    impact: "Built to push add-to-cart from high-intent visitors on mobile and desktop.",
+    impact: "Automatic checkout cart, no more worries in charging manually and outstanding branding.",
     image: "/portfolio/kadet.webp",
     fit: "cover",
     country: "United States",
@@ -211,8 +211,8 @@ export function PortfolioSection() {
                 </span>
               </h2>
               <p className="mt-2 max-w-2xl text-sm text-muted-foreground sm:text-base">
-                A rotating set of {totalItems} live projects. Browse through
-                different industries without ever leaving this section.
+                A set of some of our projects that owners authorized to share. 
+                No matter your industry, we can help you with data, and design. See our impact in their business:
               </p>
             </div>
           </div>

@@ -90,7 +90,7 @@ export function PricingSection() {
 
       <div className="container relative z-10 px-4 sm:px-6 lg:px-8 mx-auto">
         <div className="text-center mb-16 space-y-4 max-w-3xl mx-auto">
-          <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight word-mask overflow-hidden">
+          <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight word-mask">
             <span className="inline-block word-mask-reveal bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent animate-gradient">
               Plans & Pricing
             </span>

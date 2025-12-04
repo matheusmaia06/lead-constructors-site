@@ -2,8 +2,28 @@
 
 import { useEffect, useRef } from "react"
 
+interface Orb {
+  x: number
+  y: number
+  radius: number
+  dx: number
+  dy: number
+  hue: number
+  alpha: number
+}
+
+interface Particle {
+  x: number
+  y: number
+  vx: number
+  vy: number
+  size: number
+  pulsePhase: number
+  baseAlpha: number
+}
+
 export function AnimatedBackground() {
-  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const canvasRef = useRef<HTMLCanvasElement | null>(null)
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -13,99 +33,85 @@ export function AnimatedBackground() {
     if (!ctx) return
 
     const setCanvasSize = () => {
-      canvas.width = window.innerWidth
-      canvas.height = window.innerHeight
+      const dpr = window.devicePixelRatio || 1
+      const { innerWidth, innerHeight } = window
+
+      canvas.width = innerWidth * dpr
+      canvas.height = innerHeight * dpr
+      canvas.style.width = `${innerWidth}px`
+      canvas.style.height = `${innerHeight}px`
+
+      // Normaliza o sistema de coordenadas para 1:1 com CSS pixels
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
     }
+
     setCanvasSize()
     window.addEventListener("resize", setCanvasSize)
 
     const isMobile = window.innerWidth < 768
-    const prefersReducedMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
-    ).matches
+    const prefersReducedMotion =
+      typeof window.matchMedia === "function" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
 
-    if (prefersReducedMotion) {
-      // Se o usuário prefere menos animação, não inicializamos o loop intenso
-      ctx.clearRect(0, 0, canvas.width, canvas.height)
-      return
-    }
+    const ORB_COUNT = prefersReducedMotion ? 0 : isMobile ? 6 : 10
+    const PARTICLE_COUNT = prefersReducedMotion ? 12 : isMobile ? 28 : 56
 
-    const particles: Array<{
-      x: number
-      y: number
-      vx: number
-      vy: number
-      size: number
-      opacity: number
-      color: string
-      pulsePhase: number
-    }> = []
+    const orbs: Orb[] = []
+    const particles: Particle[] = []
 
-    const colors = [
-      "rgba(99, 102, 241, ", // primary blue
-      "rgba(96, 165, 250, ", // light blue
-      "rgba(59, 130, 246, ", // sky blue
-      "rgba(147, 197, 253, ", // cyan
-    ]
+    const randomInRange = (min: number, max: number) =>
+      Math.random() * (max - min) + min
 
-    const particleCount = isMobile ? 80 : 220
-    for (let i = 0; i < particleCount; i++) {
-      particles.push({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        vx: (Math.random() - 0.5) * 2,
-        vy: (Math.random() - 0.5) * 2,
-        size: Math.random() * 3 + 1,
-        opacity: Math.random() * 0.6 + 0.3,
-        color: colors[Math.floor(Math.random() * colors.length)],
-        pulsePhase: Math.random() * Math.PI * 2,
+    // Orbs grandes, neon
+    for (let i = 0; i < ORB_COUNT; i++) {
+      orbs.push({
+        x: Math.random() * window.innerWidth,
+        y: Math.random() * window.innerHeight,
+        radius: randomInRange(120, 260),
+        dx: randomInRange(-0.08, 0.08),
+        dy: randomInRange(-0.06, 0.06),
+        hue: randomInRange(180, 210), // entre ciano e azul
+        alpha: randomInRange(0.06, 0.16),
       })
     }
 
-    const orbs: Array<{
-      x: number
-      y: number
-      vx: number
-      vy: number
-      size: number
-      opacity: number
-      color: string
-      pulseSpeed: number
-    }> = []
-
-    for (let i = 0; i < 12; i++) {
-      orbs.push({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        vx: (Math.random() - 0.5) * 0.6,
-        vy: (Math.random() - 0.5) * 0.6,
-        size: Math.random() * 100 + 80,
-        opacity: Math.random() * 0.15 + 0.08,
-        color: colors[Math.floor(Math.random() * colors.length)],
-        pulseSpeed: Math.random() * 0.03 + 0.01,
+    // Partículas pequenas
+    for (let i = 0; i < PARTICLE_COUNT; i++) {
+      particles.push({
+        x: Math.random() * window.innerWidth,
+        y: Math.random() * window.innerHeight,
+        vx: randomInRange(-0.12, 0.12),
+        vy: randomInRange(-0.12, 0.12),
+        size: randomInRange(1, 2.5),
+        pulsePhase: Math.random() * Math.PI * 2,
+        baseAlpha: randomInRange(0.25, 0.6),
       })
     }
 
     let animationFrameId: number
-    let time = 0
+    let lastTime = performance.now()
 
-    const animate = () => {
-      animationFrameId = requestAnimationFrame(animate)
-      time += 0.01
+    const render = (time: number) => {
+      const delta = time - lastTime
+      lastTime = time
 
-      ctx.clearRect(0, 0, canvas.width, canvas.height)
+      // Em devices mais fracos, se der um "pulo" muito grande, suaviza
+      const dt = Math.min(delta, 40)
 
-      orbs.forEach((orb) => {
-        orb.x += orb.vx
-        orb.y += orb.vy
+      const width = window.innerWidth
+      const height = window.innerHeight
 
-        if (orb.x < -orb.size) orb.x = canvas.width + orb.size
-        if (orb.x > canvas.width + orb.size) orb.x = -orb.size
-        if (orb.y < -orb.size) orb.y = canvas.height + orb.size
-        if (orb.y > canvas.height + orb.size) orb.y = -orb.size
+      ctx.clearRect(0, 0, width, height)
 
-        const pulse = Math.sin(time * orb.pulseSpeed) * 0.3 + 1
-        const currentSize = orb.size * pulse
+      // Orbs neon
+      orbs.forEach(orb => {
+        orb.x += orb.dx * dt
+        orb.y += orb.dy * dt
+
+        if (orb.x + orb.radius < 0) orb.x = width + orb.radius
+        if (orb.x - orb.radius > width) orb.x = -orb.radius
+        if (orb.y + orb.radius < 0) orb.y = height + orb.radius
+        if (orb.y - orb.radius > height) orb.y = -orb.radius
 
         const gradient = ctx.createRadialGradient(
           orb.x,
@@ -113,63 +119,53 @@ export function AnimatedBackground() {
           0,
           orb.x,
           orb.y,
-          currentSize,
+          orb.radius
         )
-        gradient.addColorStop(0, `${orb.color}${orb.opacity * pulse})`)
+
         gradient.addColorStop(
-          0.5,
-          `${orb.color}${orb.opacity * 0.5 * pulse})`,
+          0,
+          `hsla(${orb.hue}, 100%, 70%, ${orb.alpha * 1.1})`
         )
-        gradient.addColorStop(1, `${orb.color}0)`)
+        gradient.addColorStop(
+          0.4,
+          `hsla(${orb.hue}, 100%, 60%, ${orb.alpha})`
+        )
+        gradient.addColorStop(
+          1,
+          `hsla(${orb.hue}, 100%, 50%, 0)`
+        )
 
-        ctx.beginPath()
-        ctx.arc(orb.x, orb.y, currentSize, 0, Math.PI * 2)
         ctx.fillStyle = gradient
-        ctx.fill()
-      })
-
-      particles.forEach((particle, i) => {
-        particle.x += particle.vx
-        particle.y += particle.vy
-        particle.pulsePhase += 0.05
-
-        if (particle.x < 0) particle.x = canvas.width
-        if (particle.x > canvas.width) particle.x = 0
-        if (particle.y < 0) particle.y = canvas.height
-        if (particle.y > canvas.height) particle.y = 0
-
-        const pulse = Math.sin(particle.pulsePhase) * 0.3 + 1
-        const currentSize = particle.size * pulse
-        const currentOpacity = particle.opacity * pulse
-
-        ctx.shadowBlur = 12
-        ctx.shadowColor = particle.color + currentOpacity + ")"
         ctx.beginPath()
-        ctx.arc(particle.x, particle.y, currentSize, 0, Math.PI * 2)
-        ctx.fillStyle = `${particle.color}${currentOpacity})`
+        ctx.arc(orb.x, orb.y, orb.radius, 0, Math.PI * 2)
         ctx.fill()
-        ctx.shadowBlur = 0
-
-        particles.slice(i + 1).forEach((otherParticle) => {
-          const dx = particle.x - otherParticle.x
-          const dy = particle.y - otherParticle.y
-          const distance = Math.sqrt(dx * dx + dy * dy)
-
-          if (distance < (isMobile ? 140 : 250)) {
-            ctx.beginPath()
-            ctx.moveTo(particle.x, particle.y)
-            ctx.lineTo(otherParticle.x, otherParticle.y)
-            const lineOpacity =
-              0.3 * (1 - distance / (isMobile ? 140 : 250))
-            ctx.strokeStyle = `${particle.color}${lineOpacity})`
-            ctx.lineWidth = 2
-            ctx.stroke()
-          }
-        })
       })
+
+      // Partículas / estrelas
+      particles.forEach(p => {
+        p.x += p.vx * dt * 0.03
+        p.y += p.vy * dt * 0.03
+        p.pulsePhase += 0.03
+
+        if (p.x < 0) p.x = width
+        if (p.x > width) p.x = 0
+        if (p.y < 0) p.y = height
+        if (p.y > height) p.y = 0
+
+        const pulse = Math.sin(p.pulsePhase) * 0.4 + 1
+        const currentSize = p.size * pulse
+        const alpha = p.baseAlpha * (0.5 + 0.5 * pulse)
+
+        ctx.beginPath()
+        ctx.fillStyle = `rgba(180, 230, 255, ${alpha})`
+        ctx.arc(p.x, p.y, currentSize, 0, Math.PI * 2)
+        ctx.fill()
+      })
+
+      animationFrameId = window.requestAnimationFrame(render)
     }
 
-    animate()
+    animationFrameId = window.requestAnimationFrame(render)
 
     return () => {
       window.removeEventListener("resize", setCanvasSize)
@@ -182,6 +178,7 @@ export function AnimatedBackground() {
       ref={canvasRef}
       className="pointer-events-none absolute inset-0 opacity-60"
       style={{ mixBlendMode: "screen" }}
+      aria-hidden="true"
     />
   )
 }

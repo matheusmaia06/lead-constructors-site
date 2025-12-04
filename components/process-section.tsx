@@ -48,12 +48,15 @@ export function ProcessSection() {
   // reveal da seção
   useEffect(() => {
     const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
+      entries => {
+        entries.forEach(entry => {
           if (entry.isIntersecting) setIsVisible(true)
         })
       },
-      { threshold: 0.2 },
+      {
+        // dispara mais cedo (qualquer 5% visível)
+        threshold: 0.05,
+      },
     )
 
     if (sectionRef.current) observer.observe(sectionRef.current)
@@ -74,7 +77,7 @@ export function ProcessSection() {
     <section
       ref={sectionRef}
       id="process"
-      className="w-full bg-background pt-24 md:pt-32 lg:pt-40 pb-32 md:pb-40 lg:pb-48"
+      className="w-full bg-background pt-16 md:pt-20 lg:pt-24 pb-20 md:pb-28 lg:pb-32"
     >
       <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* HEADER DA SEÇÃO */}

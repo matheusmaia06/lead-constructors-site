@@ -3,28 +3,45 @@
 import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Menu, X } from "lucide-react"
-import { motion } from "framer-motion"
+import {
+  motion,
+  useScroll,
+  useSpring,
+} from "framer-motion"
 import Image from "next/image"
 
 export function Header() {
   const [isOpen, setIsOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const [showHeader, setShowHeader] = useState(false)
-  const [pageProgress, setPageProgress] = useState(0)
   const [isMobile, setIsMobile] = useState(false)
 
-  // baseline de scroll quando o header aparece pela primeira vez
-  const [baselineScroll, setBaselineScroll] = useState<number | null>(null)
+  // Progresso global de scroll (0 → 1)
+  const { scrollYProgress } = useScroll()
+
+  // Suaviza o scroll bruto do navegador
+  const smoothScroll = useSpring(scrollYProgress, {
+    stiffness: 120,
+    damping: 20,
+    mass: 0.25,
+  })
+
+  // Valor final usado na barrinha do header
+  const headerProgress = useSpring(0, {
+    stiffness: 180,
+    damping: 24,
+    mass: 0.3,
+  })
 
   const links = [
     { label: "About", href: "#benefits" },
     { label: "Solutions", href: "#services" },
     { label: "Work", href: "#portfolio" },
     { label: "Process", href: "#process" },
-    // mantém o label FAQ, mas aponta para uma seção existente
     { label: "FAQ", href: "#pricing" },
   ]
 
+  // Detectar mobile
   useEffect(() => {
     const updateIsMobile = () => {
       if (typeof window === "undefined") return
@@ -36,68 +53,72 @@ export function Header() {
     return () => window.removeEventListener("resize", updateIsMobile)
   }, [])
 
+  // Mostrar/esconder header + estado "scrolled"
   useEffect(() => {
     const handleScroll = () => {
       const scrollY = window.scrollY
-      const docHeight =
-        document.documentElement.scrollHeight - window.innerHeight
 
-      // MOBILE: header sempre visível, como já estava
       if (isMobile) {
         setShowHeader(true)
         setScrolled(scrollY > 16)
-
-        if (docHeight > 0) {
-          setPageProgress(Math.min(scrollY / docHeight, 1))
-        } else {
-          setPageProgress(0)
-        }
-
         return
       }
 
-      // DESKTOP: header aparece quando já saímos visualmente do hero
-      // ~1 viewport de rolagem
-      const heroViewportThreshold = window.innerHeight * 0.9
+      // 👉 header aparece DEPOIS da primeira sessão (~1.1 viewport)
+      const heroViewportThreshold = window.innerHeight * 1.1
       const shouldShowHeader = scrollY >= heroViewportThreshold
 
       setShowHeader(shouldShowHeader)
       setScrolled(scrollY > heroViewportThreshold + 16)
-
-      if (shouldShowHeader) {
-        // travamos o baseline na primeira vez que o header aparece
-        setBaselineScroll(prev => (prev === null ? scrollY : prev))
-      } else {
-        // se voltamos pro topo/hero, resetamos baseline
-        setBaselineScroll(null)
-      }
-
-      if (!shouldShowHeader || docHeight <= 0 || baselineScroll === null) {
-        setPageProgress(0)
-        return
-      }
-
-      const effectiveBaseline = baselineScroll
-
-      if (scrollY <= effectiveBaseline) {
-        setPageProgress(0)
-      } else {
-        const remainingScrollable = Math.max(docHeight - effectiveBaseline, 1)
-        const adjustedScroll = scrollY - effectiveBaseline
-        const progress = Math.min(adjustedScroll / remainingScrollable, 1)
-        setPageProgress(progress)
-      }
     }
 
     handleScroll()
-    window.addEventListener("scroll", handleScroll)
+    window.addEventListener("scroll", handleScroll, { passive: true })
     window.addEventListener("resize", handleScroll)
 
     return () => {
       window.removeEventListener("scroll", handleScroll)
       window.removeEventListener("resize", handleScroll)
     }
-  }, [baselineScroll, isMobile])
+  }, [isMobile])
+
+  // Converter scroll global em progresso da barrinha com baseline no desktop
+  useEffect(() => {
+    return smoothScroll.on("change", latest => {
+      if (typeof window === "undefined") return
+
+      const docHeight =
+        document.documentElement.scrollHeight - window.innerHeight
+
+      if (docHeight <= 0) {
+        headerProgress.set(0)
+        return
+      }
+
+      const scrollY = latest * docHeight
+
+      // MOBILE: 0 → 1 na página inteira
+      if (isMobile) {
+        headerProgress.set(latest)
+        return
+      }
+
+      // DESKTOP: barra só começa a contar depois do hero (~1.1 viewport)
+      const heroThresholdPx = window.innerHeight * 1.1
+      const baselinePx = heroThresholdPx
+
+      if (scrollY <= baselinePx) {
+        headerProgress.set(0)
+        return
+      }
+
+      const remainingScrollable = Math.max(docHeight - baselinePx, 1)
+      const adjustedScroll = scrollY - baselinePx
+      const normalized = Math.min(adjustedScroll / remainingScrollable, 1)
+
+      headerProgress.set(normalized)
+    })
+  }, [smoothScroll, headerProgress, isMobile])
 
   const scrollToSection = (href: string) => {
     const target = document.querySelector(href)
@@ -195,11 +216,14 @@ export function Header() {
         </button>
       </div>
 
-      {/* Progress bar */}
+      {/* Progress bar – agora fluida com Framer Motion */}
       <div className="h-0.5 w-full bg-slate-900/80">
-        <div
-          className="h-full bg-gradient-to-r from-sky-500 via-cyan-400 to-emerald-400 transition-all duration-300"
-          style={{ width: `${pageProgress * 100}%` }}
+        <motion.div
+          className="h-full bg-gradient-to-r from-sky-500 via-cyan-400 to-emerald-400 will-change-transform"
+          style={{
+            scaleX: headerProgress,
+            transformOrigin: "0% 50%",
+          }}
         />
       </div>
 

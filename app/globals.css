@@ -544,7 +544,7 @@
 
 .word-mask {
   position: relative;
-  overflow: hidden;
+  overflow: visible; /* ou simplesmente remove a linha de overflow */
 }
 
 .word-mask-reveal {
@@ -605,8 +605,10 @@
 .premium-title {
   position: relative;
   display: inline-block;
-  overflow: hidden;
+  overflow: visible;
+  padding-bottom: 0.05em; /* opcional, microajuste */
 }
+
 
 .premium-title-inner {
   display: inline-block;
