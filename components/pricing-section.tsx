@@ -135,10 +135,16 @@ export function PricingSection() {
               </CardHeader>
 
               <CardContent className="relative space-y-6">
-                <div className="space-y-2">
-                  <div className="text-5xl font-bold tracking-tight">{plan.price}</div>
-                  <div className="text-sm text-muted-foreground">one-time payment</div>
-                </div>
+{/* PREÇO COM MENSALIDADE PARA O PLANO PROFESSIONAL */}
+<div className="space-y-2">
+  <div className="flex items-baseline gap-2">
+    <div className="text-5xl font-bold tracking-tight">{plan.price}</div>
+    <span className="text-base font-semibold opacity-80">+ $50/mo</span>
+  </div>
+  <div className="text-sm text-muted-foreground">
+    one-time payment + ongoing monthly support
+  </div>
+</div>
 
                 <ul className="space-y-3">
                   {plan.features.map((feature, featureIndex) => (
