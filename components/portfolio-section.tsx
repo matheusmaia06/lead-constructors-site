@@ -85,7 +85,8 @@ const caseStudies: CaseItem[] = [
     category: "Streetwear & Gear",
     summary:
       "Urban gear brand with bold, lifestyle-led storefronts and fast product discovery built around real-world photography.",
-    impact: "Automatic checkout cart, no more worries in charging manually and outstanding branding.",
+    impact:
+      "Automatic checkout cart, no more worries in charging manually and outstanding branding.",
     image: "/portfolio/kadet.webp",
     fit: "cover",
     country: "United States",
@@ -109,18 +110,16 @@ const ITEMS_PER_PAGE_DESKTOP = 3
 export function PortfolioSection() {
   const [page, setPage] = useState(0)
   const [touchStartX, setTouchStartX] = useState<number | null>(null)
-
   const [direction, setDirection] = useState<"next" | "prev">("next")
   const [animState, setAnimState] = useState<"idle" | "enter">("idle")
-
   const [leftArrowPulse, setLeftArrowPulse] = useState(false)
   const [rightArrowPulse, setRightArrowPulse] = useState(false)
 
+  // índice do slide no mobile (1 case por vez)
+  const [mobileIndex, setMobileIndex] = useState(0)
+
   const totalItems = caseStudies.length
-  const totalPages = Math.max(
-    1,
-    Math.ceil(totalItems / ITEMS_PER_PAGE_DESKTOP),
-  )
+  const totalPages = Math.max(1, Math.ceil(totalItems / ITEMS_PER_PAGE_DESKTOP))
 
   const clampPage = (p: number) => Math.max(0, Math.min(totalPages - 1, p))
 
@@ -146,7 +145,7 @@ export function PortfolioSection() {
     setPage(clampPage(p))
   }
 
-  // animação leve na troca de página
+  // animação leve na troca de página (desktop)
   useEffect(() => {
     setAnimState("enter")
     const id = requestAnimationFrame(() => {
@@ -175,6 +174,7 @@ export function PortfolioSection() {
   }
 
   const isLastPage = page === totalPages - 1
+  const isLastMobileSlide = mobileIndex === totalItems - 1
 
   const gridAnimClass =
     animState === "enter"
@@ -182,6 +182,14 @@ export function PortfolioSection() {
         ? "opacity-0 translate-x-4"
         : "opacity-0 -translate-x-4"
       : "opacity-100 translate-x-0"
+
+  const handlePrevMobile = () => {
+    setMobileIndex(prev => (prev - 1 + totalItems) % totalItems)
+  }
+
+  const handleNextMobile = () => {
+    setMobileIndex(prev => (prev + 1) % totalItems)
+  }
 
   return (
     <section
@@ -211,8 +219,9 @@ export function PortfolioSection() {
                 </span>
               </h2>
               <p className="mt-2 max-w-2xl text-sm text-muted-foreground sm:text-base">
-                A set of some of our projects that owners authorized to share. 
-                No matter your industry, we can help you with data, and design. See our impact in their business:
+                A set of some of our projects that owners authorized to share.
+                No matter your industry, we can help you with data, and design.
+                See our impact in their business:
               </p>
             </div>
           </div>
@@ -247,9 +256,126 @@ export function PortfolioSection() {
           </div>
         </div>
 
-        {/* CARROSSEL + SETAS */}
+        {/* MOBILE: carrossel de 1 case por vez */}
+        <div className="mt-8 md:hidden">
+          <div className="relative max-w-md mx-auto">
+            <div className="overflow-hidden rounded-2xl">
+              <div
+                className="flex transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"
+                style={{
+                  transform: `translateX(-${mobileIndex * 100}%)`,
+                }}
+              >
+                {caseStudies.map((item, index) => (
+                  <article
+                    key={item.id}
+                    className="min-w-full flex flex-col overflow-hidden rounded-2xl border border-border/70 bg-background/90 shadow-[0_14px_45px_rgba(15,23,42,0.55)]"
+                  >
+                    <div className="relative w-full overflow-hidden">
+                      <div className="relative aspect-[4/3] w-full">
+                        <Image
+                          src={item.image || "/placeholder.svg"}
+                          alt={`${item.name} website`}
+                          fill
+                          className={`transition-transform duration-700 ${
+                            item.fit === "contain"
+                              ? "object-contain bg-black"
+                              : "object-cover"
+                          }`}
+                          sizes="100vw"
+                        />
+                      </div>
+                      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80" />
+
+                      <div className="absolute inset-x-4 bottom-3 flex items-center justify-between gap-3">
+                        <div className="space-y-1">
+                          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-300">
+                            Case {String(index + 1).padStart(2, "0")}
+                          </p>
+                          <p className="text-xs font-medium text-slate-50 line-clamp-1">
+                            {item.name}
+                          </p>
+                        </div>
+                        {/* PILL "LIVE" EM VERDE GRADIENTE (MOBILE) */}
+                        <span className="rounded-full bg-gradient-to-r from-emerald-400 via-lime-300 to-emerald-300 px-3 py-1 text-[10px] font-semibold text-slate-900 shadow-sm">
+                          LIVE
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-1 flex-col gap-2 px-4 pb-4 pt-3 sm:px-5 sm:pb-5">
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
+                        {item.category}
+                      </p>
+                      <p className="text-sm text-foreground">
+                        {item.summary}
+                      </p>
+                      <p className="text-xs font-medium text-emerald-500/90">
+                        {item.impact}
+                      </p>
+
+                      <div className="mt-auto pt-2">
+                        <a
+                          href={item.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 text-xs font-semibold text-primary transition-colors hover:text-primary/80"
+                        >
+                          <span>Open case</span>
+                          <ExternalLink className="h-3.5 w-3.5" />
+                        </a>
+                      </div>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </div>
+
+            {/* setas – reposicionadas para não cobrir o título */}
+            <button
+              type="button"
+              onClick={handlePrevMobile}
+              className="absolute left-2 -translate-y-1/2 flex h-10 w-10 items-center justify-center rounded-full border border-border/70 bg-background/95 text-muted-foreground shadow-lg shadow-slate-900/60 active:scale-95"
+              style={{ top: "42%" }}
+              aria-label="Previous case"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </button>
+            <button
+              type="button"
+              onClick={handleNextMobile}
+              className="absolute right-2 -translate-y-1/2 flex h-10 w-10 items-center justify-center rounded-full border border-border/70 bg-background/95 text-muted-foreground shadow-lg shadow-slate-900/60 active:scale-95"
+              style={{ top: "42%" }}
+              aria-label="Next case"
+            >
+              <ArrowRight className="h-5 w-5" />
+            </button>
+
+            {/* dots */}
+            <div className="mt-4 flex justify-center gap-2">
+              {caseStudies.map((_, i) => {
+                const isActive = i === mobileIndex
+                return (
+                  <button
+                    key={i}
+                    type="button"
+                    onClick={() => setMobileIndex(i)}
+                    className={`h-2 rounded-full transition-all ${
+                      isActive
+                        ? "w-6 bg-gradient-to-r from-primary via-cyan-400 to-emerald-400 shadow-[0_0_10px_rgba(45,212,191,0.8)]"
+                        : "w-2 bg-border/70 hover:bg-border"
+                    }`}
+                    aria-label={`Go to case ${i + 1}`}
+                  />
+                )
+              })}
+            </div>
+          </div>
+        </div>
+
+        {/* DESKTOP/TABLET – grid paginado */}
         <div
-          className="flex items-stretch gap-4"
+          className="hidden items-stretch gap-4 md:flex"
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
         >
@@ -267,7 +393,7 @@ export function PortfolioSection() {
             </button>
           </div>
 
-          {/* TRACK */}
+          {/* track */}
           <div className="relative flex-1 overflow-hidden">
             <div
               className={`flex w-full transform transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${gridAnimClass}`}
@@ -321,8 +447,9 @@ export function PortfolioSection() {
                                 {item.name}
                               </p>
                             </div>
-                            <span className="rounded-full bg-white/95 px-3 py-1 text-[10px] font-semibold text-slate-900 shadow-sm">
-                              View live
+                            {/* PILL "LIVE" EM VERDE GRADIENTE (DESKTOP) */}
+                            <span className="rounded-full bg-gradient-to-r from-emerald-400 via-lime-300 to-emerald-300 px-3 py-1 text-[10px] font-semibold text-slate-900 shadow-sm">
+                              LIVE
                             </span>
                           </div>
                         </div>
@@ -353,13 +480,12 @@ export function PortfolioSection() {
                       </article>
                     ))}
 
-                    {/* BLOCO 150+ NO LUGAR DOS CASES 8/9 NA ÚLTIMA PÁGINA (DESKTOP) */}
+                    {/* BLOCO 150+ NO FINAL (DESKTOP) */}
                     {pageIndex === page &&
                       pageIndex === totalPages - 1 &&
                       remainingSlots > 0 && (
                         <div className="hidden md:flex md:col-span-2">
                           <div className="highlight-150-card relative flex w-full flex-col justify-center overflow-hidden rounded-2xl border border-border/70 bg-background/80 px-8 py-10 shadow-[0_14px_45px_rgba(15,23,42,0.45)]">
-                            {/* glows de fundo */}
                             <div className="pointer-events-none absolute inset-0 opacity-70">
                               <div className="absolute -left-10 top-0 h-40 w-40 rounded-full bg-cyan-500/8 blur-3xl" />
                               <div className="absolute bottom-0 right-[-40px] h-44 w-44 rounded-full bg-emerald-400/8 blur-3xl" />
@@ -412,7 +538,7 @@ export function PortfolioSection() {
         {/* HIGHLIGHT 150+ – MOBILE / TABLET */}
         <div
           className={`mx-auto mt-6 max-w-3xl text-center transition-all duration-600 ease-out md:hidden ${
-            isLastPage
+            isLastMobileSlide
               ? "opacity-100 translate-y-0"
               : "pointer-events-none opacity-0 translate-y-2"
           }`}
@@ -430,50 +556,6 @@ export function PortfolioSection() {
             From boutique brands to global teams, we design experiences that
             travel well.
           </p>
-        </div>
-
-        {/* navegação mobile */}
-        <div className="mt-4 flex items-center justify-center gap-4 md:hidden">
-          <button
-            type="button"
-            onClick={goPrev}
-            disabled={page === 0}
-            className={`arrow-ripple inline-flex h-9 w-9 items-center justify-center rounded-full border border-border/70 bg-background/95 text-muted-foreground shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary/70 hover:text-primary/90 disabled:cursor-not-allowed disabled:opacity-30 ${
-              leftArrowPulse ? "arrow-ripple--active" : ""
-            }`}
-          >
-            <ArrowLeft className="h-4 w-4" />
-          </button>
-
-          <div className="flex items-center gap-2">
-            {Array.from({ length: totalPages }).map((_, i) => {
-              const isActive = i === page
-              return (
-                <button
-                  key={i}
-                  type="button"
-                  onClick={() => goTo(i)}
-                  className={`h-2.5 rounded-full transition-all ${
-                    isActive
-                      ? "w-6 bg-gradient-to-r from-primary via-cyan-400 to-emerald-400 shadow-[0_0_10px_rgba(45,212,191,0.8)]"
-                      : "w-2.5 bg-border/70 hover:bg-border"
-                  }`}
-                  aria-label={`Go to set ${i + 1}`}
-                />
-              )
-            })}
-          </div>
-
-          <button
-            type="button"
-            onClick={goNext}
-            disabled={page === totalPages - 1}
-            className={`arrow-ripple inline-flex h-9 w-9 items-center justify-center rounded-full border border-border/70 bg-background/95 text-muted-foreground shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary/70 hover:text-primary/90 disabled:cursor-not-allowed disabled:opacity-30 ${
-              rightArrowPulse ? "arrow-ripple--active" : ""
-            }`}
-          >
-            <ArrowRight className="h-4 w-4" />
-          </button>
         </div>
       </div>
 

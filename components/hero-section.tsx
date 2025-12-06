@@ -5,7 +5,7 @@ import type React from "react"
 import { useScroll } from "framer-motion"
 import { AnimatedBackground } from "./animated-background"
 
-const PIN_MULTIPLIER = 5 // hero pinado por 5x a altura do viewport
+const PIN_MULTIPLIER = 3 // hero pinado por 3x a altura do viewport
 
 export function HeroSection() {
   const [currentImage, setCurrentImage] = useState(0)
@@ -18,18 +18,21 @@ export function HeroSection() {
     offset: ["start start", "end end"],
   })
 
+  // baseline visual: mesmo com scroll 0, a hero já entra um pouco animada
+  const visualScrollProgress = Math.max(scrollProgress, 0.07)
+
   const phase = (start: number, end: number) => {
     if (end <= start) return 0
-    const t = (scrollProgress - start) / (end - start)
+    const t = (visualScrollProgress - start) / (end - start)
     return Math.min(1, Math.max(0, t))
   }
 
   const headlineProgress = phase(0.02, 0.15)
-  const negativesProgress = phase(0.15, 0.3)
+  const benefitsProgress = phase(0.15, 0.3)
   const finalResultsProgress = phase(0.4, 0.5)
   const underlineProgress = phase(0.1, 0.2)
 
-  // liga o scrollYProgress do Framer no nosso scrollProgress
+  // liga o scrollYProgress do Framer no nosso scrollProgress bruto
   useEffect(() => {
     const unsubscribe = scrollYProgress.on("change", value => {
       setScrollProgress(value)
@@ -46,14 +49,14 @@ export function HeroSection() {
     return () => clearInterval(interval)
   }, [])
 
-  // HERO BACKGROUND IMAGES
+  // HERO BACKGROUND IMAGES (mantido, caso queira usar depois)
   const backgroundImages = [
     "/abstract-technology-digital-blue-gradient.jpg",
     "/abstract-technology-digital-blue-gradient-2.jpg",
     "/abstract-technology-digital-blue-gradient-3.jpg",
   ]
 
-  const headline = "Your business deserves real digital presence."
+  const headline = "Your business deserves... real digital presence."
   const headlineWords = headline.split(" ")
 
   const wordStyle = (index: number): React.CSSProperties => {
@@ -71,6 +74,9 @@ export function HeroSection() {
       transition: "opacity 0.2s, transform 0.2s, filter 0.2s",
     }
   }
+
+  // opacidade do "scroll cue": some suavemente conforme o usuário rola
+  const scrollCueOpacity = 1 - Math.min(scrollProgress / 0.18, 1)
 
   return (
     <div
@@ -121,15 +127,18 @@ export function HeroSection() {
             <div className="max-w-2xl md:max-w-3xl">
               <h1
                 className="font-bold leading-[1.1] text-left text-white"
-                style={{
-                  fontSize: "clamp(2.6rem, 5vw, 4.2rem)",
-                  letterSpacing: "-0.035em",
-                }}
+                style={
+                  {
+                    fontSize: "clamp(2.6rem, 5vw, 4.2rem)",
+                    letterSpacing: "-0.035em",
+                  } as React.CSSProperties
+                }
               >
                 {headlineWords.map((word, index) => {
                   const baseStyle = wordStyle(index)
 
-                  if (word !== "deserves") {
+                  // se não é "deserves..." (comeca com deserves), renderiza normal
+                  if (!word.toLowerCase().startsWith("deserves")) {
                     return (
                       <span
                         key={index}
@@ -141,7 +150,7 @@ export function HeroSection() {
                     )
                   }
 
-                  // palavra com sublinhado animado
+                  // palavra "deserves..." com sublinhado animado
                   return (
                     <span
                       key={index}
@@ -166,105 +175,122 @@ export function HeroSection() {
                 })}
               </h1>
 
-              {/* SUBTÍTULO */}
+              {/* SUBTÍTULO – POSITIVO / INSTITUCIONAL */}
               <p
                 className="mt-6 max-w-xl text-base sm:text-lg md:text-xl text-sky-100/90"
                 style={{
-                  opacity: negativesProgress,
-                  transform: `translateY(${(1 - negativesProgress) * 12}px)`,
-                  filter: `blur(${(1 - negativesProgress) * 6}px)`,
+                  opacity: benefitsProgress,
+                  transform: `translateY(${(1 - benefitsProgress) * 12}px)`,
+                  filter: `blur(${(1 - benefitsProgress) * 6}px)`,
                   transition:
                     "opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), filter 0.4s cubic-bezier(0.16, 1, 0.3, 1)",
                 }}
               >
-                We build high-converting, modern websites for freelancers and
-                small businesses that care about results, not just aesthetics.{" "}
+                We design and build modern websites that combine strong visual
+                presence with measurable business outcomes.{" "}
                 <span className="text-sky-200/95">
-                  No bloated retainers, no overpriced agencies – just real work
-                  that brings clients.
+                  Lean structure, senior execution, and transparent pricing
+                  from the first conversation to launch.
                 </span>
               </p>
             </div>
 
-            {/* BLOCO DA DIREITA – “NO BULLSHIT” */}
+            {/* BLOCO DA DIREITA – BENEFÍCIOS POSITIVOS */}
             <div className="mt-10 grid gap-6 md:mt-0 md:absolute md:right-0 md:top-1/2 md:flex md:-translate-y-1/2 md:flex-col md:items-end">
               <div
-  className="max-w-sm rounded-2xl border border-red-400/40 bg-red-950/60 px-6 py-5 
-             text-red-50 shadow-lg shadow-red-900/40 backdrop-blur-md space-y-2"
-  style={{
-    opacity: negativesProgress,
-    transform: `translateY(${(1 - negativesProgress) * 18}px)`,
-    transition:
-      "opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)",
-  }}
->
-  <p className="text-lg sm:text-xl font-semibold leading-tight tracking-tight">
-    No{" "}
-    <span className="relative text-red-300 font-extrabold">
-      <span className="relative z-10">complications</span>
-      <span className="pointer-events-none absolute left-0 right-0 top-1/2 h-[2px] 
-                       -translate-y-1/2 bg-red-400/90" />
-    </span>
-    .
-  </p>
+                className="max-w-sm rounded-2xl border border-cyan-400/40 bg-slate-950/75 px-6 py-5 text-sky-50 shadow-lg shadow-cyan-900/40 backdrop-blur-md space-y-4"
+                style={{
+                  opacity: benefitsProgress,
+                  transform: `translateY(${(1 - benefitsProgress) * 18}px)`,
+                  transition:
+                    "opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)",
+                }}
+              >
+                <div className="text-xs font-semibold uppercase tracking-[0.2em] text-sky-300/80">
+                  What you can expect
+                </div>
 
-  <p className="text-lg sm:text-xl font-semibold leading-tight tracking-tight">
-    No{" "}
-    <span className="relative text-red-300 font-extrabold">
-      <span className="relative z-10">absurd prices</span>
-      <span className="pointer-events-none absolute left-0 right-0 top-1/2 h-[2px] 
-                       -translate-y-1/2 bg-red-400/90" />
-    </span>
-    .
-  </p>
+                <div className="space-y-3 text-sm sm:text-base">
+                  <div className="border-l-2 border-cyan-400/70 pl-3">
+                    <p className="font-semibold">Structured, guided process</p>
+                    <p className="mt-1 text-sky-100/80">
+                      From discovery to launch, every step is mapped and
+                      communicated so you always know what comes next.
+                    </p>
+                  </div>
 
-  <p className="text-lg sm:text-xl font-semibold leading-tight tracking-tight">
-    No{" "}
-    <span className="relative text-red-300 font-extrabold">
-      <span className="relative z-10">agency bullshit</span>
-      <span className="pointer-events-none absolute left-0 right-0 top-1/2 h-[2px] 
-                       -translate-y-1/2 bg-red-400/90" />
-    </span>
-    .
-  </p>
-</div>
+                  <div className="border-l-2 border-cyan-400/70 pl-3">
+                    <p className="font-semibold">Design aligned with outcomes</p>
+                    <p className="mt-1 text-sky-100/80">
+                      Interfaces crafted to support your positioning,
+                      strengthen credibility, and generate qualified leads.
+                    </p>
+                  </div>
+
+                  <div className="border-l-2 border-cyan-400/70 pl-3">
+                    <p className="font-semibold">Complete delivery</p>
+                    <p className="mt-1 text-sky-100/80">
+                      Domain, hosting, analytics and integrations configured,
+                      ready for you to grow from day one.
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
         {/* HERO OVERLAY – JUST REAL RESULTS */}
         <div
-  className="pointer-events-none absolute inset-0 flex items-center justify-center z-20"
-  style={{
-    opacity: finalResultsProgress,
-    transform: `scale(${0.9 + finalResultsProgress * 0.15}) translateY(${
-      (1 - finalResultsProgress) * 30
-    }px)`,
-    transition:
-      "opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1)",
-  }}
->
-  <h2 className="text-center font-extrabold leading-tight uppercase px-4">
-    <span
-      className={`
+          className="pointer-events-none absolute inset-0 flex items-center justify-center z-20"
+          style={{
+            opacity: finalResultsProgress,
+            transform: `scale(${
+              0.9 + finalResultsProgress * 0.15
+            }) translateY(${(1 - finalResultsProgress) * 30}px)`,
+            transition:
+              "opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1)",
+          }}
+        >
+          <h2 className="text-center font-extrabold leading-tight uppercase px-4">
+            <span
+              className={`
         inline-block bg-gradient-to-r from-sky-300 via-cyan-400 to-emerald-300 
         bg-clip-text text-transparent 
         text-3xl sm:text-4xl md:text-5xl 
         tracking-[0.18em] sm:tracking-[0.3em] md:tracking-[0.5em]
       `}
-      style={{
-        textShadow: `
+              style={{
+                textShadow: `
           0 0 20px rgba(56, 189, 248, 0.95),
           0 0 40px rgba(56, 189, 248, 0.65)
         `,
-        filter: `blur(${(1 - finalResultsProgress) * 3}px)`,
-      }}
-    >
-      <span className="block md:inline">JUST REAL</span>
-      <span className="block md:inline md:ml-4">RESULTS.</span>
-    </span>
-  </h2>
-</div>
+                filter: `blur(${(1 - finalResultsProgress) * 3}px)`,
+              }}
+            >
+              <span className="block md:inline">JUST REAL</span>
+              <span className="block md:inline md:ml-4">RESULTS.</span>
+            </span>
+          </h2>
+        </div>
+
+        {/* SCROLL CUE – chama o usuário pra rolar */}
+        <div
+          className="pointer-events-none absolute inset-x-0 bottom-8 flex justify-center z-30"
+          style={{
+            opacity: scrollCueOpacity,
+            transform: `translateY(${(1 - scrollCueOpacity) * 8}px)`,
+            transition:
+              "opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)",
+          }}
+        >
+          <div className="flex flex-col items-center gap-3 text-[11px] sm:text-xs text-sky-100/80 tracking-[0.25em] uppercase">
+            <span>Scroll to see how it works</span>
+            <div className="flex h-9 w-6 items-center justify-center rounded-full border border-sky-200/60 bg-slate-950/60 backdrop-blur-md">
+              <span className="text-lg leading-none animate-bounce">↓</span>
+            </div>
+          </div>
+        </div>
       </section>
     </div>
   )

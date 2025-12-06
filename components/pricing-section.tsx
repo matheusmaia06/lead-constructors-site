@@ -2,7 +2,14 @@
 
 import { Check, Crown } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
 import { useEffect, useRef, useState } from "react"
 
 const plans = [
@@ -49,17 +56,19 @@ const plans = [
 ]
 
 export function PricingSection() {
-  const [visibleCards, setVisibleCards] = useState<boolean[]>(new Array(plans.length).fill(false))
+  const [visibleCards, setVisibleCards] = useState<boolean[]>(
+    new Array(plans.length).fill(false),
+  )
   const sectionRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
+      entries => {
+        entries.forEach(entry => {
           if (entry.isIntersecting) {
             plans.forEach((_, index) => {
               setTimeout(() => {
-                setVisibleCards((prev) => {
+                setVisibleCards(prev => {
                   const newState = [...prev]
                   newState[index] = true
                   return newState
@@ -80,7 +89,11 @@ export function PricingSection() {
   }, [])
 
   return (
-    <section ref={sectionRef} id="pricing" className="relative w-full py-20 md:py-32 overflow-hidden">
+    <section
+      ref={sectionRef}
+      id="pricing"
+      className="relative w-full py-20 md:py-32 overflow-hidden"
+    >
       <div className="absolute inset-0 bg-gradient-to-b from-background via-muted/20 to-background blur-reveal" />
       <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/10 rounded-full blur-3xl animate-pulse-glow" />
       <div
@@ -90,13 +103,16 @@ export function PricingSection() {
 
       <div className="container relative z-10 px-4 sm:px-6 lg:px-8 mx-auto">
         <div className="text-center mb-16 space-y-4 max-w-3xl mx-auto">
-          <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight word-mask">
-            <span className="inline-block word-mask-reveal bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent animate-gradient">
+          {/* título com gradiente, sem máscara quebrando o final da palavra */}
+          <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight">
+            <span className="inline-block px-1 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent animate-gradient">
               Plans & Pricing
             </span>
           </h2>
+
           <p className="text-lg sm:text-xl text-muted-foreground text-balance leading-relaxed smooth-appear">
-            Affordable investment with everything included. We handle it all for you.
+            Affordable investment with everything included. We handle it all for
+            you.
           </p>
         </div>
 
@@ -108,7 +124,11 @@ export function PricingSection() {
                 plan.popular
                   ? "border-primary/50 shadow-2xl shadow-primary/20 bg-card lg:-translate-y-4"
                   : "border-border/50 bg-card/50 hover:bg-card hover:shadow-xl"
-              } ${visibleCards[index] ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
+              } ${
+                visibleCards[index]
+                  ? "opacity-100 translate-y-0"
+                  : "opacity-0 translate-y-10"
+              }`}
               style={{
                 transitionDelay: `${index * 150}ms`,
                 transition: "all 0.7s cubic-bezier(0.16, 1, 0.3, 1)",
@@ -131,26 +151,37 @@ export function PricingSection() {
                   <plan.icon className="h-8 w-8 text-white" />
                 </div>
                 <CardTitle className="text-3xl">{plan.name}</CardTitle>
-                <CardDescription className="text-base">{plan.description}</CardDescription>
+                <CardDescription className="text-base">
+                  {plan.description}
+                </CardDescription>
               </CardHeader>
 
               <CardContent className="relative space-y-6">
-{/* PREÇO COM MENSALIDADE PARA O PLANO PROFESSIONAL */}
-<div className="space-y-2">
-  <div className="flex items-baseline gap-2">
-    <div className="text-5xl font-bold tracking-tight">{plan.price}</div>
-    <span className="text-base font-semibold opacity-80">+ $50/mo</span>
-  </div>
-  <div className="text-sm text-muted-foreground">
-    one-time payment + ongoing monthly support
-  </div>
-</div>
+                {/* preço + mensalidade */}
+                <div className="space-y-2">
+                  <div className="flex items-baseline gap-2">
+                    <div className="text-5xl font-bold tracking-tight">
+                      {plan.price}
+                    </div>
+                    <span className="text-base font-semibold opacity-80">
+                      + $50/mo
+                    </span>
+                  </div>
+                  <div className="text-sm text-muted-foreground">
+                    one-time payment + ongoing monthly support
+                  </div>
+                </div>
 
                 <ul className="space-y-3">
                   {plan.features.map((feature, featureIndex) => (
-                    <li key={featureIndex} className="flex items-start gap-3">
+                    <li
+                      key={featureIndex}
+                      className="flex items-start gap-3"
+                    >
                       <Check className="h-5 w-5 text-primary shrink-0 mt-0.5" />
-                      <span className="text-sm leading-relaxed">{feature}</span>
+                      <span className="text-sm leading-relaxed">
+                        {feature}
+                      </span>
                     </li>
                   ))}
                 </ul>
@@ -180,7 +211,9 @@ export function PricingSection() {
           <p className="text-lg font-semibold text-foreground">
             Everything included: hosting, domain, and complete setup
           </p>
-          <p className="text-muted-foreground">We take care of everything. You just focus on your business.</p>
+          <p className="text-muted-foreground">
+            We take care of everything. You just focus on your business.
+          </p>
         </div>
       </div>
     </section>

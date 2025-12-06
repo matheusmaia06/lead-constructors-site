@@ -1,7 +1,16 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import { Code, Palette, Rocket, Search, Smartphone, Zap } from "lucide-react"
+import {
+  Code,
+  Palette,
+  Rocket,
+  Search,
+  Smartphone,
+  Zap,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react"
 import {
   Card,
   CardContent,
@@ -74,6 +83,9 @@ export function ServicesCarousel() {
   // client-only flag para evitar diferenças de trig entre Node e browser
   const [mounted, setMounted] = useState(false)
 
+  // índice do slide no mobile
+  const [mobileIndex, setMobileIndex] = useState(0)
+
   useEffect(() => {
     setMounted(true)
   }, [])
@@ -110,6 +122,14 @@ export function ServicesCarousel() {
     const y = Math.sin(angle) * radius
 
     return { x, y }
+  }
+
+  const handlePrevMobile = () => {
+    setMobileIndex(prev => (prev - 1 + services.length) % services.length)
+  }
+
+  const handleNextMobile = () => {
+    setMobileIndex(prev => (prev + 1) % services.length)
   }
 
   return (
@@ -149,9 +169,7 @@ export function ServicesCarousel() {
       <div className="container relative z-10 px-4 sm:px-6 lg:px-8 mx-auto">
         {/* Título / descrição */}
         <div className="text-center mb-16 space-y-4 max-w-3xl mx-auto">
-          <FancySectionTitle>
-            Our Services
-          </FancySectionTitle>
+          <FancySectionTitle>Our Services</FancySectionTitle>
 
           <p className="text-lg sm:text-xl text-muted-foreground text-balance leading-relaxed">
             Everything you need for a powerful and professional digital
@@ -159,33 +177,77 @@ export function ServicesCarousel() {
           </p>
         </div>
 
-        {/* MOBILE – grid simples, sem órbita */}
-        <div className="mt-10 grid gap-6 sm:grid-cols-2 md:hidden">
-          {services.map(service => (
-            <Card
-              key={service.title}
-              className="relative overflow-hidden border border-cyan-500/15 bg-slate-950/85 backdrop-blur-md"
+        {/* MOBILE – carrossel horizontal com setas sobrepostas */}
+        <div className="mt-10 md:hidden">
+          <div className="relative max-w-sm mx-auto">
+            <div className="overflow-hidden rounded-2xl">
+              <div
+                className="flex transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"
+                style={{
+                  transform: `translateX(-${mobileIndex * 100}%)`,
+                }}
+              >
+                {services.map(service => (
+                  <Card
+                    key={service.title}
+                    className="relative overflow-hidden border border-cyan-500/15 bg-slate-950/85 backdrop-blur-md min-w-full"
+                  >
+                    <CardHeader className="pb-2">
+                      <div
+                        className={`inline-flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br ${service.color} mb-3`}
+                      >
+                        <service.icon className="h-6 w-6 text-white" />
+                      </div>
+                      <CardTitle className="text-base text-sky-100">
+                        {service.title}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="pt-0 pb-6">
+                      <CardDescription className="text-sm leading-relaxed">
+                        {service.description}
+                      </CardDescription>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+
+            {/* Setas sobrepostas no centro vertical do card */}
+            <button
+              type="button"
+              onClick={handlePrevMobile}
+              className="absolute left-2 top-1/2 -translate-y-1/2 flex h-10 w-10 items-center justify-center rounded-full border border-slate-700/70 bg-slate-950/85 text-slate-100 shadow-lg shadow-slate-900/60 active:scale-95"
             >
-              <CardHeader className="pb-2">
-                <div
-                  className={`inline-flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br ${service.color} mb-3`}
-                >
-                  <service.icon className="h-6 w-6 text-white" />
-                </div>
-                <CardTitle className="text-base text-sky-100">
-                  {service.title}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="pt-0 pb-4">
-                <CardDescription className="text-sm leading-relaxed">
-                  {service.description}
-                </CardDescription>
-              </CardContent>
-            </Card>
-          ))}
+              <ChevronLeft className="h-5 w-5" />
+            </button>
+            <button
+              type="button"
+              onClick={handleNextMobile}
+              className="absolute right-2 top-1/2 -translate-y-1/2 flex h-10 w-10 items-center justify-center rounded-full border border-slate-700/70 bg-slate-950/85 text-slate-100 shadow-lg shadow-slate-900/60 active:scale-95"
+            >
+              <ChevronRight className="h-5 w-5" />
+            </button>
+
+            {/* Dots de progresso */}
+            <div className="mt-4 flex justify-center gap-2">
+              {services.map((_, index) => (
+                <button
+                  key={index}
+                  type="button"
+                  onClick={() => setMobileIndex(index)}
+                  className={`h-1.5 rounded-full transition-all duration-300 ${
+                    mobileIndex === index
+                      ? "w-6 bg-sky-400"
+                      : "w-2 bg-slate-600"
+                  }`}
+                  aria-label={`Go to slide ${index + 1}`}
+                />
+              ))}
+            </div>
+          </div>
         </div>
 
-        {/* DESKTOP – Orbital Carousel (client-only para evitar hydration mismatch de trig) */}
+        {/* DESKTOP – Orbital Carousel (inalterado) */}
         {mounted && (
           <div className="relative max-w-6xl mx-auto hidden md:block">
             <div className="relative w-full md:aspect-[4/3] max-w-4xl mx-auto flex items-center justify-center">

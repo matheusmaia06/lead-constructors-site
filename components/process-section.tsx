@@ -1,6 +1,12 @@
 "use client"
 
-import { CheckCircle2, MessageSquare, Palette, Rocket } from "lucide-react"
+import {
+  CheckCircle2,
+  MessageSquare,
+  Palette,
+  Rocket,
+  XCircle,
+} from "lucide-react"
 import { useEffect, useRef, useState } from "react"
 import { motion, useScroll, useTransform } from "framer-motion"
 
@@ -36,6 +42,34 @@ const steps = [
     description:
       "Complete deployment with domain, hosting, and everything configured so you can focus on growth.",
     duration: "1 day",
+  },
+]
+
+const comparisonRows = [
+  {
+    label: "Timeline",
+    traditional: "Open-ended, with long gaps between design, development and launch.",
+    lead: "Defined 7–10 day window from brief to launch, with clear milestones.",
+  },
+  {
+    label: "Scope & clarity",
+    traditional: "Loose brief, expectations change along the way and revisions pile up.",
+    lead: "Structured discovery with clear objectives, scope and success criteria from day one.",
+  },
+  {
+    label: "Communication",
+    traditional: "Updates happen when you ask. Visibility depends on who is managing the project.",
+    lead: "Regular check-ins, documented decisions and a shared view of what is being done at each stage.",
+  },
+  {
+    label: "Ownership & governance",
+    traditional: "Decisions concentrated in one person, with little documentation or process.",
+    lead: "Defined responsibilities, documented steps and a repeatable methodology you can trust.",
+  },
+  {
+    label: "Launch & handover",
+    traditional: "Launch delayed, missing analytics, SEO or integrations. Handover is unclear.",
+    lead: "Complete launch with tracking, SEO basics and integrations configured, ready to operate from day one.",
   },
 ]
 
@@ -81,7 +115,7 @@ export function ProcessSection() {
     >
       <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* HEADER DA SEÇÃO */}
-        <div className="mb-14 md:mb-16">
+        <div className="mb-10 md:mb-14 lg:mb-16">
           <div className="section-title-wrapper">
             <h2
               className={`premium-title text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold transition-all duration-1000 ${
@@ -89,7 +123,7 @@ export function ProcessSection() {
               }`}
             >
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-sky-500 to-emerald-400">
-                Move Fast + Make Things
+                Move Fast, Build Carefully
               </span>
             </h2>
             <span className="section-title-bar" />
@@ -100,9 +134,66 @@ export function ProcessSection() {
               isVisible ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
             }`}
           >
-            Our streamlined process delivers exceptional results in record time.
+            A repeatable process that combines speed with structure, so your website
+            is launched quickly without sacrificing quality or governance.
           </p>
         </div>
+
+        {/* TABELA COMPARATIVA */}
+        <motion.div
+          className="mb-16 rounded-3xl border border-slate-800/70 bg-slate-950/80 shadow-[0_18px_60px_rgba(15,23,42,0.9)] backdrop-blur-xl"
+          initial={{ opacity: 0, y: 18 }}
+          animate={isVisible ? { opacity: 1, y: 0 } : { opacity: 0, y: 18 }}
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+        >
+          <div className="border-b border-slate-800/80 px-6 py-6 md:px-8 md:py-7 lg:px-10">
+            <p className="text-xs font-semibold tracking-[0.22em] uppercase text-slate-400">
+              How we work differently
+            </p>
+            <div className="mt-2 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+              <h3 className="text-xl md:text-2xl lg:text-3xl font-semibold text-slate-50">
+                A clear alternative to traditional website projects
+              </h3>
+              <p className="max-w-md text-sm md:text-base text-slate-400">
+                Instead of open-ended timelines and scope creep, you get a defined
+                sequence with ownership at each step and a clear launch date.
+              </p>
+            </div>
+          </div>
+
+          <div className="overflow-hidden rounded-b-3xl">
+            {/* Cabeçalho da tabela */}
+            <div className="grid grid-cols-[1.05fr_1.1fr_1.1fr] border-b border-slate-800/80 bg-slate-950/95 px-6 py-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 md:px-8">
+              <div />
+              <div>Traditional approach</div>
+              <div className="text-sky-300">Lead Constructors process</div>
+            </div>
+
+            {/* Linhas */}
+            {comparisonRows.map((row, index) => (
+              <div
+                key={row.label}
+                className={`group grid grid-cols-[1.05fr_1.1fr_1.1fr] border-t border-slate-900/80 px-6 py-4 text-sm transition-colors duration-200 md:px-8 ${
+                  index % 2 === 0 ? "bg-slate-950/70" : "bg-slate-950/60"
+                } hover:bg-slate-900/90`}
+              >
+                <div className="pr-4 font-medium text-slate-100">
+                  {row.label}
+                </div>
+
+                <div className="flex items-start gap-2 pr-4 text-slate-400 group-hover:text-slate-200">
+                  <XCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-rose-400/90" />
+                  <p className="leading-relaxed">{row.traditional}</p>
+                </div>
+
+                <div className="flex items-start gap-2 text-slate-100 group-hover:text-sky-100">
+                  <CheckCircle2 className="mt-0.5 h-4 w-4 flex-shrink-0 text-emerald-400" />
+                  <p className="leading-relaxed">{row.lead}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </motion.div>
 
         {/* LISTA DE ETAPAS */}
         <div className="space-y-24 md:space-y-32">
