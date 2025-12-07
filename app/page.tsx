@@ -19,8 +19,8 @@ export default function HomePage() {
       <main>
         <HeroSection />
         <BenefitsSection />
-        <ServicesCarousel />
         <PortfolioSection />
+        <ServicesCarousel />
         <ProcessSection />
         <PricingSection />
         <CtaSection />

@@ -103,7 +103,6 @@ export function PricingSection() {
 
       <div className="container relative z-10 px-4 sm:px-6 lg:px-8 mx-auto">
         <div className="text-center mb-16 space-y-4 max-w-3xl mx-auto">
-          {/* título com gradiente, sem máscara quebrando o final da palavra */}
           <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight">
             <span className="inline-block px-1 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent animate-gradient">
               Plans & Pricing
@@ -111,8 +110,7 @@ export function PricingSection() {
           </h2>
 
           <p className="text-lg sm:text-xl text-muted-foreground text-balance leading-relaxed smooth-appear">
-            Affordable investment with everything included. We handle it all for
-            you.
+            Affordable investment with everything included. We handle it all for you.
           </p>
         </div>
 
@@ -157,7 +155,6 @@ export function PricingSection() {
               </CardHeader>
 
               <CardContent className="relative space-y-6">
-                {/* preço + mensalidade */}
                 <div className="space-y-2">
                   <div className="flex items-baseline gap-2">
                     <div className="text-5xl font-bold tracking-tight">
@@ -187,8 +184,10 @@ export function PricingSection() {
                 </ul>
               </CardContent>
 
+              {/* 🔥 UPDATED BUTTON WITH PAYPAL LINKS */}
               <CardFooter className="relative">
                 <Button
+                  asChild
                   className={`w-full h-12 text-base transition-all ${
                     plan.popular
                       ? "bg-gradient-to-r from-primary to-accent hover:shadow-xl hover:shadow-primary/50 hover:scale-105"
@@ -196,7 +195,17 @@ export function PricingSection() {
                   }`}
                   variant={plan.popular ? "default" : "outline"}
                 >
-                  Get Started
+                  <a
+                    href={
+                      plan.name === "Essential"
+                        ? "https://www.paypal.com/ncp/payment/THR5NWFSZF4EW"
+                        : "https://www.paypal.com/ncp/payment/ZFRKG3GVZUQUL"
+                    }
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Get Started
+                  </a>
                 </Button>
               </CardFooter>
 

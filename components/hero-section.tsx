@@ -137,7 +137,7 @@ export function HeroSection() {
                 {headlineWords.map((word, index) => {
                   const baseStyle = wordStyle(index)
 
-                  // se não é "deserves..." (comeca com deserves), renderiza normal
+                  // se não é "deserves..." (começa com deserves), renderiza normal
                   if (!word.toLowerCase().startsWith("deserves")) {
                     return (
                       <span
@@ -285,12 +285,43 @@ export function HeroSection() {
           }}
         >
           <div className="flex flex-col items-center gap-3 text-[11px] sm:text-xs text-sky-100/80 tracking-[0.25em] uppercase">
-            <span>Scroll to see how it works</span>
-            <div className="flex h-9 w-6 items-center justify-center rounded-full border border-sky-200/60 bg-slate-950/60 backdrop-blur-md">
+            {/* texto só em telas maiores, pra não poluir o mobile */}
+            <span className="hidden sm:block">Scroll to see how it works</span>
+
+            {/* versão mobile: seta grande piscando no centro horizontal */}
+            <div className="flex md:hidden h-12 w-12 items-center justify-center rounded-full border border-sky-200/70 bg-slate-950/80 backdrop-blur-md shadow-[0_0_22px_rgba(56,189,248,0.9)]">
+              <span className="text-2xl leading-none scroll-arrow-pulse">
+                ↓
+              </span>
+            </div>
+
+            {/* versão desktop/tablet: mais discreta, como antes */}
+            <div className="hidden md:flex h-9 w-6 items-center justify-center rounded-full border border-sky-200/60 bg-slate-950/60 backdrop-blur-md">
               <span className="text-lg leading-none animate-bounce">↓</span>
             </div>
           </div>
         </div>
+
+        {/* animação custom da seta mobile */}
+        <style jsx>{`
+          @keyframes scrollArrowPulse {
+            0% {
+              transform: translateY(0);
+              opacity: 0.3;
+            }
+            50% {
+              transform: translateY(8px);
+              opacity: 1;
+            }
+            100% {
+              transform: translateY(0);
+              opacity: 0.3;
+            }
+          }
+          .scroll-arrow-pulse {
+            animation: scrollArrowPulse 1.1s ease-in-out infinite;
+          }
+        `}</style>
       </section>
     </div>
   )
